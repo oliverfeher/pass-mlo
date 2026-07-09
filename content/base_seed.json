@@ -1,0 +1,588 @@
+{
+  "meta": {
+    "version": "0.1",
+    "batch": 1,
+    "note": "Batch 1 of ~7 toward the 350-question v1 target. All items authored clean-room from primary sources (statutes, regulations, and the public NMLS Test Content Outline). Each item carries a primary_source_citation. Requires SME + legal review before commercial use. Figures reflect general/commonly-tested values; verify current thresholds at each quarterly review.",
+    "weighting_target": {
+      "Origination Activities": 0.27,
+      "Federal Laws": 0.24,
+      "General Mortgage Knowledge": 0.2,
+      "Ethics": 0.18,
+      "Uniform State": 0.11
+    },
+    "outline_source": "content/outline.json (official NMLS Test Content Outline)",
+    "id_note": "Question ids are opaque; content_area and outline_ref are authoritative (the id prefix is not)."
+  },
+  "questions": [
+    {
+      "id": "FED-0001",
+      "content_area": "Federal Laws",
+      "outline_ref": "1.1.3",
+      "subtopic": "RESPA — Section 8 kickbacks",
+      "difficulty": "medium",
+      "type": "application-scenario",
+      "stem": "A settlement agent offers an MLO $250 for each closed loan the MLO refers, with no service performed in exchange. Under RESPA, this arrangement is:",
+      "options": [
+        "Permissible if the borrower is told about it in writing",
+        "A prohibited referral fee subject to criminal penalties",
+        "Permissible because settlement services are involved",
+        "Permissible if the payment stays under $500 per loan"
+      ],
+      "correct_index": 1,
+      "explanation": "RESPA Section 8(a) prohibits giving or accepting any fee, kickback, or thing of value for referring settlement-service business. A payment tied purely to referrals, with no compensable service rendered, is exactly the conduct banned, and it carries criminal exposure (fines up to $10,000 and up to one year in prison). Disclosure to the borrower does not cure a Section 8 violation, the presence of settlement services does not make a referral fee legal, and there is no dollar-amount safe harbor that permits it.",
+      "primary_source_citation": "12 U.S.C. §2607(a), (d); Regulation X, 12 CFR §1024.14",
+      "last_reviewed_date": "2026-07-08"
+    },
+    {
+      "id": "FED-0002",
+      "content_area": "Federal Laws",
+      "outline_ref": "1.3.4",
+      "subtopic": "TILA — right of rescission (transaction type)",
+      "difficulty": "medium",
+      "type": "application-scenario",
+      "stem": "A consumer closes on a loan to purchase their primary residence and, two days later, wants to cancel under the right of rescission. What is the correct response?",
+      "options": [
+        "They may cancel by the end of the third business day",
+        "The right of rescission does not apply to a purchase-money loan",
+        "They may cancel within three years",
+        "They may cancel only if the appraisal was late"
+      ],
+      "correct_index": 1,
+      "explanation": "The TILA right of rescission does not extend to residential mortgage (purchase-money) transactions secured by the consumer's principal dwelling. It applies to refinances with a new creditor, home-equity lines, and home-improvement loans on the principal dwelling. Because this is a purchase, there is no three-business-day or three-year rescission right, and the appraisal timing is irrelevant to whether rescission applies.",
+      "primary_source_citation": "15 U.S.C. §1635(e); Regulation Z, 12 CFR §1026.23(a), (f)",
+      "last_reviewed_date": "2026-07-08"
+    },
+    {
+      "id": "FED-0003",
+      "content_area": "Federal Laws",
+      "outline_ref": "1.3.4",
+      "subtopic": "TILA — three-year rescission",
+      "difficulty": "hard",
+      "type": "application-scenario",
+      "stem": "On a refinance of a principal residence with a new creditor, the lender never delivered the notice of the right to rescind. How long may the consumer have to rescind?",
+      "options": [
+        "Three business days from consummation, regardless",
+        "Up to three years, because required notice/disclosures were not provided",
+        "Thirty days from the first payment",
+        "There is no rescission right on a refinance"
+      ],
+      "correct_index": 1,
+      "explanation": "When the lender fails to deliver the notice of the right to rescind or the material TILA disclosures, the rescission window extends from three business days to as long as three years. The three-business-day period assumes proper delivery, so it does not control here. The thirty-day option is a distractor drawn from ECOA timing, and a new-creditor refinance of a principal dwelling is in fact rescindable.",
+      "primary_source_citation": "15 U.S.C. §1635(f); Regulation Z, 12 CFR §1026.23(a)(3)",
+      "last_reviewed_date": "2026-07-08"
+    },
+    {
+      "id": "FED-0004",
+      "content_area": "Federal Laws",
+      "outline_ref": "1.4.7",
+      "subtopic": "TRID — Loan Estimate timing",
+      "difficulty": "medium",
+      "type": "recall",
+      "stem": "Once a consumer submits the six items that constitute an application, the Loan Estimate must be delivered or placed in the mail no later than:",
+      "options": [
+        "At consummation",
+        "Three business days after receiving the application",
+        "Three business days before consummation",
+        "Thirty days after application"
+      ],
+      "correct_index": 1,
+      "explanation": "The Loan Estimate must be delivered or mailed within three business days of receiving an application. The 'three business days before consummation' option is the Closing Disclosure rule, a frequently tested trap. Delivering at consummation is far too late, and thirty days is an ECOA notice period, not a TRID disclosure deadline.",
+      "primary_source_citation": "Regulation Z, 12 CFR §1026.19(e)(1)(iii)",
+      "last_reviewed_date": "2026-07-08"
+    },
+    {
+      "id": "FED-0005",
+      "content_area": "Federal Laws",
+      "outline_ref": "1.4.7",
+      "subtopic": "TRID — Closing Disclosure timing",
+      "difficulty": "medium",
+      "type": "recall",
+      "stem": "The consumer must receive the Closing Disclosure no later than:",
+      "options": [
+        "Three business days after application",
+        "Three business days before consummation",
+        "On the day of closing",
+        "Within thirty days of the Loan Estimate"
+      ],
+      "correct_index": 1,
+      "explanation": "The consumer must receive the Closing Disclosure at least three business days before consummation, allowing time to compare final terms to the Loan Estimate. Certain changes, such as an APR increase beyond tolerance, addition of a prepayment penalty, or a change in loan product, restart that three-day clock. The other options confuse this with the Loan Estimate deadline or invent timeframes.",
+      "primary_source_citation": "Regulation Z, 12 CFR §1026.19(f)(1)(ii)",
+      "last_reviewed_date": "2026-07-08"
+    },
+    {
+      "id": "FED-0006",
+      "content_area": "Federal Laws",
+      "outline_ref": "1.2.7",
+      "subtopic": "ECOA — adverse action notice",
+      "difficulty": "medium",
+      "type": "recall",
+      "stem": "Under ECOA, notice of adverse action on a completed application must be provided within:",
+      "options": [
+        "3 business days",
+        "15 days",
+        "30 days",
+        "60 days"
+      ],
+      "correct_index": 2,
+      "explanation": "ECOA and Regulation B require notice of adverse action within 30 days after receiving a completed application. The same 30-day framework governs notices of approval, counteroffers, and incompleteness. The three-business-day option borrows from TILA disclosure timing; 15 and 60 days are not the ECOA standard.",
+      "primary_source_citation": "15 U.S.C. §1691(d); Regulation B, 12 CFR §1002.9(a)(1)",
+      "last_reviewed_date": "2026-07-08"
+    },
+    {
+      "id": "FED-0007",
+      "content_area": "General Mortgage Knowledge",
+      "outline_ref": "3.1.1",
+      "subtopic": "ATR/QM — Qualified Mortgage features",
+      "difficulty": "medium",
+      "type": "application-scenario",
+      "stem": "Which loan feature would disqualify a loan from Qualified Mortgage status?",
+      "options": [
+        "A 30-year fixed term",
+        "Points and fees of 2.5% of the loan amount",
+        "Negative amortization",
+        "Full verification of income and assets"
+      ],
+      "correct_index": 2,
+      "explanation": "A Qualified Mortgage may not include negative amortization, interest-only payments, balloon payments (with limited exceptions), terms exceeding 30 years, or points and fees above the applicable cap (generally 3%). A 30-year term is allowed, 2.5% in points and fees is under the cap, and verifying income and assets is a requirement for a QM rather than a disqualifier.",
+      "primary_source_citation": "Regulation Z, 12 CFR §1026.43(e)",
+      "last_reviewed_date": "2026-07-08"
+    },
+    {
+      "id": "FED-0008",
+      "content_area": "Origination Activities",
+      "outline_ref": "4.2.1",
+      "subtopic": "ATR — underwriting factors",
+      "difficulty": "hard",
+      "type": "recall",
+      "stem": "Under the Ability-to-Repay rule, how many underwriting factors must a creditor consider?",
+      "options": [
+        "Three",
+        "Five",
+        "Eight",
+        "Twelve"
+      ],
+      "correct_index": 2,
+      "explanation": "The ATR rule requires creditors to consider eight underwriting factors, including current income or assets, employment status, the monthly mortgage payment, payments on simultaneous loans, other mortgage-related obligations, current debt and alimony/child support, the monthly debt-to-income ratio or residual income, and credit history. The other counts are distractors.",
+      "primary_source_citation": "Regulation Z, 12 CFR §1026.43(c)(2)",
+      "last_reviewed_date": "2026-07-08"
+    },
+    {
+      "id": "ORIG-0001",
+      "content_area": "Origination Activities",
+      "outline_ref": "4.1.2",
+      "subtopic": "URLA — section mapping",
+      "difficulty": "easy",
+      "type": "recall",
+      "stem": "On the Uniform Residential Loan Application (Form 1003), which section captures the borrower's basic identifying information, such as name and Social Security number?",
+      "options": [
+        "Section 1: Borrower Information",
+        "Section 4: Loan and Property Information",
+        "Section 5: Declarations",
+        "Section 8: Demographic Information"
+      ],
+      "correct_index": 0,
+      "explanation": "Section 1 collects borrower identifying and employment/income information. Section 4 covers loan and property details, Section 5 is declarations (such as bankruptcy or pending lawsuits), and Section 8 gathers demographic data for fair-lending monitoring. Knowing which URLA section holds which content is frequently tested in the origination area.",
+      "primary_source_citation": "Fannie Mae/Freddie Mac Uniform Residential Loan Application (Form 1003/65), Section 1",
+      "last_reviewed_date": "2026-07-08"
+    },
+    {
+      "id": "ORIG-0002",
+      "content_area": "Federal Laws",
+      "outline_ref": "1.2.9",
+      "subtopic": "URLA — demographic information",
+      "difficulty": "medium",
+      "type": "application-scenario",
+      "stem": "A borrower declines to provide the ethnicity, sex, and race information in Section 8 of the URLA during a face-to-face application. The MLO should:",
+      "options": [
+        "Refuse to continue until the borrower answers",
+        "Note that the borrower declined and record the information by visual observation or surname as required",
+        "Leave the application incomplete and stop working on it",
+        "Enter assumptions and treat them as borrower-supplied facts"
+      ],
+      "correct_index": 1,
+      "explanation": "Section 8 demographic data supports HMDA and fair-lending monitoring. Borrowers may decline, but for applications taken in person the MLO must still note the information on the basis of visual observation or surname. The MLO never refuses the application over this, never treats it as a stopping point, and never records assumptions as if the borrower supplied them.",
+      "primary_source_citation": "Regulation C, 12 CFR §1003.4(a)(10); Appendix B to Part 1003",
+      "last_reviewed_date": "2026-07-08"
+    },
+    {
+      "id": "ORIG-0003",
+      "content_area": "Origination Activities",
+      "outline_ref": "4.2.1",
+      "subtopic": "Calculations — LTV",
+      "difficulty": "easy",
+      "type": "calculation",
+      "stem": "A property appraises at $250,000 and the borrower finances $200,000. The loan-to-value ratio is:",
+      "options": [
+        "75%",
+        "80%",
+        "85%",
+        "125%"
+      ],
+      "correct_index": 1,
+      "explanation": "Loan-to-value equals the loan amount divided by the property value (the lesser of sale price or appraised value): $200,000 / $250,000 = 0.80, or 80%. On a conventional loan, 80% LTV is the threshold at or below which private mortgage insurance is typically avoided.",
+      "primary_source_citation": "Standard mortgage underwriting definition; see Regulation Z §1026.32 for LTV usage in high-cost tests",
+      "last_reviewed_date": "2026-07-08"
+    },
+    {
+      "id": "ORIG-0004",
+      "content_area": "Origination Activities",
+      "outline_ref": "4.2.1",
+      "subtopic": "Calculations — DTI",
+      "difficulty": "medium",
+      "type": "calculation",
+      "stem": "Gross monthly income is $6,000. The proposed housing payment is $1,500 and other monthly debts total $600. The back-end (total) DTI is:",
+      "options": [
+        "25%",
+        "30%",
+        "35%",
+        "40%"
+      ],
+      "correct_index": 2,
+      "explanation": "Back-end DTI equals total monthly debt, including housing, divided by gross monthly income: ($1,500 + $600) / $6,000 = $2,100 / $6,000 = 35%. The 25% figure is the front-end (housing-only) ratio and is offered as a distractor.",
+      "primary_source_citation": "Standard underwriting definition; DTI referenced in Regulation Z §1026.43(c)(7)",
+      "last_reviewed_date": "2026-07-08"
+    },
+    {
+      "id": "ORIG-0005",
+      "content_area": "Origination Activities",
+      "outline_ref": "4.4.4",
+      "subtopic": "Calculations — discount points",
+      "difficulty": "easy",
+      "type": "calculation",
+      "stem": "A borrower pays 2 discount points on a $180,000 loan. In dollars, that equals:",
+      "options": [
+        "$1,800",
+        "$2,700",
+        "$3,600",
+        "$4,500"
+      ],
+      "correct_index": 2,
+      "explanation": "One discount point equals 1% of the loan amount. Two points is 2% of $180,000: 0.02 × $180,000 = $3,600. Points are prepaid interest paid at closing to reduce the note rate.",
+      "primary_source_citation": "Standard mortgage-finance definition; points treated as prepaid finance charge under Regulation Z §1026.4",
+      "last_reviewed_date": "2026-07-08"
+    },
+    {
+      "id": "ORIG-0006",
+      "content_area": "Origination Activities",
+      "outline_ref": "4.4.1",
+      "subtopic": "Prepaid interest",
+      "difficulty": "medium",
+      "type": "application-scenario",
+      "stem": "Per-diem (prepaid) interest collected at closing covers:",
+      "options": [
+        "Interest from the disbursement date through the end of that month",
+        "Interest for the entire first year of the loan",
+        "The lender's origination fee",
+        "Interest during the rescission period only"
+      ],
+      "correct_index": 0,
+      "explanation": "Because mortgage interest is paid in arrears, per-diem interest at closing covers the days from disbursement through the last day of that month. Closing later in the month reduces the prepaid interest collected. It is not a full year of interest, is unrelated to the origination fee, and is not limited to the rescission period.",
+      "primary_source_citation": "Standard closing-cost practice; prepaid interest disclosed on the Closing Disclosure, Regulation Z §1026.38",
+      "last_reviewed_date": "2026-07-08"
+    },
+    {
+      "id": "ORIG-0007",
+      "content_area": "Origination Activities",
+      "outline_ref": "4.1.1",
+      "subtopic": "TRID — definition of application",
+      "difficulty": "medium",
+      "type": "recall",
+      "stem": "Which set of items constitutes an application under TRID, triggering the Loan Estimate deadline?",
+      "options": [
+        "Name, income, Social Security number, property address, estimated property value, and loan amount sought",
+        "Only a signed purchase contract",
+        "Name and phone number",
+        "A completed appraisal and title commitment"
+      ],
+      "correct_index": 0,
+      "explanation": "TRID defines an application by six pieces of information: name, income, Social Security number, property address, estimated property value, and the loan amount sought. Receiving all six starts the three-business-day Loan Estimate clock. A purchase contract, contact details alone, or third-party reports do not by themselves constitute an application.",
+      "primary_source_citation": "Regulation Z, 12 CFR §1026.2(a)(3)",
+      "last_reviewed_date": "2026-07-08"
+    },
+    {
+      "id": "ORIG-0008",
+      "content_area": "Origination Activities",
+      "outline_ref": "4.1.6",
+      "subtopic": "ECOA — incomplete application",
+      "difficulty": "medium",
+      "type": "application-scenario",
+      "stem": "An application arrives missing information needed to make a credit decision. The proper action is to:",
+      "options": [
+        "Deny the loan immediately for incompleteness",
+        "Send a notice of incompleteness stating what is needed and a reasonable deadline",
+        "Wait indefinitely for the borrower to follow up",
+        "Approve conditionally and gather documents after closing"
+      ],
+      "correct_index": 1,
+      "explanation": "For an incomplete application, Regulation B provides for a notice of incompleteness that specifies the information required and sets a reasonable time to supply it, generally within the 30-day framework. An outright denial for incompleteness, indefinite inaction, or closing first and collecting later are all improper.",
+      "primary_source_citation": "Regulation B, 12 CFR §1002.9(c)",
+      "last_reviewed_date": "2026-07-08"
+    },
+    {
+      "id": "GEN-0001",
+      "content_area": "General Mortgage Knowledge",
+      "outline_ref": "3.2.2",
+      "subtopic": "ARM — fully indexed rate",
+      "difficulty": "easy",
+      "type": "recall",
+      "stem": "On an adjustable-rate mortgage, the fully indexed rate equals:",
+      "options": [
+        "Index minus margin",
+        "Index plus margin",
+        "Margin minus the lifetime cap",
+        "Start rate plus the periodic cap"
+      ],
+      "correct_index": 1,
+      "explanation": "The fully indexed rate is the index plus the margin. The index moves with the market, while the margin is the lender's fixed add-on that remains constant for the life of the loan. Caps then limit how much the rate may actually change at each adjustment and over the loan's life.",
+      "primary_source_citation": "Standard ARM definition; ARM disclosure requirements at Regulation Z §1026.19(b) and §1026.20(c)",
+      "last_reviewed_date": "2026-07-08"
+    },
+    {
+      "id": "GEN-0002",
+      "content_area": "General Mortgage Knowledge",
+      "outline_ref": "3.2.2",
+      "subtopic": "ARM — cap structure",
+      "difficulty": "medium",
+      "type": "application-scenario",
+      "stem": "An ARM is quoted as '2/2/5.' The middle number represents the:",
+      "options": [
+        "Initial adjustment cap",
+        "Periodic (subsequent) adjustment cap",
+        "Lifetime cap",
+        "Margin"
+      ],
+      "correct_index": 1,
+      "explanation": "In a 2/2/5 structure the first number is the initial adjustment cap, the middle number is the periodic cap limiting each subsequent adjustment, and the final number is the lifetime cap over the start rate. The margin is a separate figure and is not one of the three cap numbers.",
+      "primary_source_citation": "Standard ARM cap convention; consumer ARM booklet referenced in Regulation Z §1026.19(b)",
+      "last_reviewed_date": "2026-07-08"
+    },
+    {
+      "id": "GEN-0003",
+      "content_area": "General Mortgage Knowledge",
+      "outline_ref": "3.1.3",
+      "subtopic": "FHA loans — mortgage insurance",
+      "difficulty": "medium",
+      "type": "application-scenario",
+      "stem": "Which statement about FHA loans is correct?",
+      "options": [
+        "They require a 20% down payment",
+        "They require mortgage insurance (upfront plus annual) regardless of down payment",
+        "They are available only to veterans",
+        "They never require mortgage insurance"
+      ],
+      "correct_index": 1,
+      "explanation": "FHA loans permit low down payments but require mortgage insurance, an upfront premium plus an annual premium, which on most current terms lasts the life of the loan. They are not limited to veterans (that describes VA loans), do not require 20% down, and always carry FHA mortgage insurance.",
+      "primary_source_citation": "National Housing Act; HUD FHA Single Family Handbook 4000.1",
+      "last_reviewed_date": "2026-07-08"
+    },
+    {
+      "id": "GEN-0004",
+      "content_area": "General Mortgage Knowledge",
+      "outline_ref": "3.1.3",
+      "subtopic": "VA loans — features",
+      "difficulty": "easy",
+      "type": "recall",
+      "stem": "A defining feature of a VA loan is:",
+      "options": [
+        "A required 10% down payment",
+        "No down payment for eligible borrowers and a funding fee in place of monthly mortgage insurance",
+        "Mandatory monthly private mortgage insurance",
+        "Availability to any borrower regardless of service"
+      ],
+      "correct_index": 1,
+      "explanation": "VA loans allow eligible veterans and service members to purchase with no down payment and charge a one-time funding fee instead of monthly mortgage insurance. They are limited to those with qualifying military service and certain eligible survivors, and they do not carry monthly PMI.",
+      "primary_source_citation": "38 U.S.C. Chapter 37; VA Lenders Handbook (VA Pamphlet 26-7)",
+      "last_reviewed_date": "2026-07-08"
+    },
+    {
+      "id": "GEN-0005",
+      "content_area": "General Mortgage Knowledge",
+      "outline_ref": "3.1.4",
+      "subtopic": "Loan classification — jumbo",
+      "difficulty": "easy",
+      "type": "recall",
+      "stem": "A loan whose amount exceeds the conforming loan limits set by the FHFA is called a:",
+      "options": [
+        "FHA loan",
+        "Conforming loan",
+        "Jumbo (non-conforming) loan",
+        "Bridge loan"
+      ],
+      "correct_index": 2,
+      "explanation": "Loans above the FHFA conforming limits cannot be purchased by Fannie Mae or Freddie Mac and are called jumbo, or non-conforming, loans. They typically carry stricter underwriting because they lack GSE backing. A bridge loan is short-term interim financing and is unrelated to loan size limits.",
+      "primary_source_citation": "Federal Housing Finance Agency conforming loan limit definitions (12 U.S.C. §1717)",
+      "last_reviewed_date": "2026-07-08"
+    },
+    {
+      "id": "GEN-0006",
+      "content_area": "General Mortgage Knowledge",
+      "outline_ref": "3.1.4",
+      "subtopic": "Negative amortization",
+      "difficulty": "medium",
+      "type": "recall",
+      "stem": "Negative amortization occurs when:",
+      "options": [
+        "The borrower pays extra toward principal each month",
+        "The payment is less than the interest due, so unpaid interest is added to principal",
+        "The loan is paid off early",
+        "The rate is fixed for the life of the loan"
+      ],
+      "correct_index": 1,
+      "explanation": "Negative amortization means the periodic payment does not cover the interest owed, so the shortfall is added to the loan balance and the borrower can owe more over time than originally borrowed. It is a prohibited feature for Qualified Mortgages. The other options describe accelerated payoff, early payoff, or a fixed rate.",
+      "primary_source_citation": "Regulation Z, 12 CFR §1026.43(e)(2)(i); definition at §1026.18(s)",
+      "last_reviewed_date": "2026-07-08"
+    },
+    {
+      "id": "ETH-0001",
+      "content_area": "Ethics",
+      "outline_ref": "5.2.4",
+      "subtopic": "Application accuracy — false income",
+      "difficulty": "medium",
+      "type": "application-scenario",
+      "stem": "A borrower says their real income is lower than what would qualify them and asks the MLO to enter a higher figure. The MLO should:",
+      "options": [
+        "Enter the higher figure because the borrower requested it",
+        "Refuse to falsify income and record only accurate, verifiable information",
+        "Enter the higher figure but label it an estimate",
+        "Average the two figures"
+      ],
+      "correct_index": 1,
+      "explanation": "Overstating income is loan fraud regardless of who requests it. The MLO must record only accurate, verifiable information. Entering a false figure, disguising it as an estimate, or averaging toward a false number all constitute falsification and expose the MLO to license revocation and criminal liability.",
+      "primary_source_citation": "SAFE Act prohibited acts, 12 CFR §1008.103; general fraud prohibitions",
+      "last_reviewed_date": "2026-07-08"
+    },
+    {
+      "id": "ETH-0002",
+      "content_area": "Ethics",
+      "outline_ref": "5.2.4",
+      "subtopic": "Confidentiality — third-party requests",
+      "difficulty": "medium",
+      "type": "application-scenario",
+      "stem": "A caller who is not a party to the loan asks the MLO for details about a borrower's application. The MLO should:",
+      "options": [
+        "Share the information since the caller seems to know the borrower",
+        "Decline to disclose the borrower's nonpublic personal information to outside parties",
+        "Share only the loan amount",
+        "Confirm whether the person has applied"
+      ],
+      "correct_index": 1,
+      "explanation": "Borrower application information is nonpublic and protected. The MLO must not disclose details, or even confirm that someone has applied, to unauthorized outside parties. Sharing a partial detail like the loan amount, or confirming the existence of an application, still breaches the duty to safeguard customer information.",
+      "primary_source_citation": "Gramm-Leach-Bliley Act privacy provisions, 15 U.S.C. §6801; Regulation P, 12 CFR Part 1016",
+      "last_reviewed_date": "2026-07-08"
+    },
+    {
+      "id": "ETH-0003",
+      "content_area": "Ethics",
+      "outline_ref": "5.1.6",
+      "subtopic": "Steering / LO compensation",
+      "difficulty": "medium",
+      "type": "application-scenario",
+      "stem": "An MLO could earn more by placing a well-qualified borrower into a costlier subprime product the borrower does not need. Doing so would be:",
+      "options": [
+        "Acceptable if the borrower agrees",
+        "Steering, which is a prohibited practice",
+        "Required to maximize lender revenue",
+        "Permitted if disclosed on the Loan Estimate"
+      ],
+      "correct_index": 1,
+      "explanation": "Directing a borrower into a worse or costlier loan than they qualify for, to increase the originator's compensation, is steering, which the Loan Originator Compensation rule and fair-lending principles prohibit. Borrower consent or a disclosure does not make steering acceptable.",
+      "primary_source_citation": "Regulation Z, 12 CFR §1026.36(e) (anti-steering)",
+      "last_reviewed_date": "2026-07-08"
+    },
+    {
+      "id": "ETH-0004",
+      "content_area": "Ethics",
+      "outline_ref": "5.2.4",
+      "subtopic": "Undisclosed deposits",
+      "difficulty": "hard",
+      "type": "application-scenario",
+      "stem": "While reviewing bank statements, an MLO notices a large deposit inconsistent with the borrower's stated income. The ethical action is to:",
+      "options": [
+        "Ignore it to keep the file moving",
+        "Ask the borrower to source and document the deposit and convey the material information to the underwriter",
+        "Delete the deposit from the statements",
+        "Coach the borrower to call it a gift regardless of the facts"
+      ],
+      "correct_index": 1,
+      "explanation": "A large unexplained deposit is material; it may be an undisclosed loan affecting DTI or another underwriting concern. The MLO must have the borrower source and document it and must convey the material information to the underwriter. Ignoring, altering statements, or coaching a false explanation is fraud.",
+      "primary_source_citation": "SAFE Act prohibited acts, 12 CFR §1008.103; duty of accurate disclosure to lender/underwriter",
+      "last_reviewed_date": "2026-07-08"
+    },
+    {
+      "id": "ETH-0005",
+      "content_area": "Ethics",
+      "outline_ref": "5.1.2",
+      "subtopic": "Appraiser independence",
+      "difficulty": "medium",
+      "type": "application-scenario",
+      "stem": "Which action regarding the appraisal is permissible for an MLO?",
+      "options": [
+        "Telling the appraiser the value the deal needs to reach",
+        "Providing the appraiser with factual information such as the purchase contract",
+        "Choosing an appraiser known to return high values",
+        "Withholding payment unless the value comes in high enough"
+      ],
+      "correct_index": 1,
+      "explanation": "Appraiser-independence rules prohibit coercing, influencing, or pressuring an appraiser toward a target value. Supplying legitimate factual information, such as the sales contract, is permitted. Communicating a needed value, selecting appraisers for inflated results, or conditioning payment on the outcome are all prohibited.",
+      "primary_source_citation": "Regulation Z, 12 CFR §1026.42 (valuation independence)",
+      "last_reviewed_date": "2026-07-08"
+    },
+    {
+      "id": "STATE-0001",
+      "content_area": "Uniform State",
+      "outline_ref": "2.3.11",
+      "subtopic": "SAFE Act — education hours",
+      "difficulty": "easy",
+      "type": "recall",
+      "stem": "Under the SAFE Act, the minimum pre-licensing education and the minimum annual continuing education for a state-licensed MLO are:",
+      "options": [
+        "20 hours pre-licensing; 8 hours CE per year",
+        "8 hours pre-licensing; 20 hours CE per year",
+        "40 hours pre-licensing; 12 hours CE per year",
+        "20 hours pre-licensing; no CE required"
+      ],
+      "correct_index": 0,
+      "explanation": "The SAFE Act requires a minimum of 20 hours of NMLS-approved pre-licensing education and at least 8 hours of NMLS-approved continuing education each year. States may require additional hours but not fewer, and CE is not optional for maintaining a license.",
+      "primary_source_citation": "12 U.S.C. §5104, §5105; Regulation H, 12 CFR §1008.105, §1008.107",
+      "last_reviewed_date": "2026-07-08"
+    },
+    {
+      "id": "STATE-0002",
+      "content_area": "Uniform State",
+      "outline_ref": "2.3.5",
+      "subtopic": "SAFE Act — Regulation G vs H",
+      "difficulty": "medium",
+      "type": "application-scenario",
+      "stem": "Regulation H under the SAFE Act applies to:",
+      "options": [
+        "Employees of depository institutions (registered MLOs)",
+        "Nondepository institutions and their employees, such as state-licensed mortgage companies, brokers, and MLOs",
+        "Only federal credit unions",
+        "Appraisers"
+      ],
+      "correct_index": 1,
+      "explanation": "Regulation H governs state licensing of nondepository institutions and their loan originators. Regulation G covers federal registration of MLOs employed by depository institutions. The distinction between registered (depository, Reg G) and licensed (nondepository, Reg H) originators is a common Uniform State item.",
+      "primary_source_citation": "Regulation G, 12 CFR Part 1007; Regulation H, 12 CFR Part 1008",
+      "last_reviewed_date": "2026-07-08"
+    },
+    {
+      "id": "STATE-0003",
+      "content_area": "Uniform State",
+      "outline_ref": "2.3.6",
+      "subtopic": "SAFE Act — felony disqualification",
+      "difficulty": "medium",
+      "type": "application-scenario",
+      "stem": "How does a felony conviction affect MLO licensing eligibility under the SAFE Act?",
+      "options": [
+        "It has no effect",
+        "A felony in the past 7 years bars licensing; a felony involving fraud, dishonesty, breach of trust, or money laundering bars licensing permanently",
+        "It matters only for misdemeanors",
+        "It bars licensing for 30 days"
+      ],
+      "correct_index": 1,
+      "explanation": "The SAFE Act permanently bars anyone convicted at any time of a felony involving fraud, dishonesty, breach of trust, or money laundering, and bars licensing for any felony conviction within the preceding seven years. Fingerprint-based background checks enforce these standards.",
+      "primary_source_citation": "12 U.S.C. §5104(b)(2); Regulation H, 12 CFR §1008.105(d)",
+      "last_reviewed_date": "2026-07-08"
+    }
+  ]
+}

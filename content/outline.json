@@ -1,0 +1,560 @@
+{
+  "meta": {
+    "source": "SAFE MLO National Test with Uniform State Test Content Outline (NMLS/CSBS)",
+    "source_url": "https://mortgage.nationwidelicensingsystem.org/knowledge/products/nmls/pubs/testingHbk/education/mlo_testing/mlo_test_faq/mlo_testing_hbk_testOutline.html",
+    "captured": "2026-07-08",
+    "structure": "120 items (115 scored, 5 unscored). Pass = 75%.",
+    "note": "This outline is the source of truth for authoring. Every question in questions.json carries an outline_ref pointing to a leaf id below. The outline is not exhaustive of every testable detail, and legislative changes occur; re-verify against primary sources each quarter."
+  },
+  "areas": [
+    {
+      "code": "FED",
+      "content_area": "Federal Laws",
+      "official_name": "Federal Mortgage Related Laws",
+      "weight": 0.24,
+      "target_count": 84,
+      "leaves": [
+        {
+          "id": "1.1.1",
+          "label": "RESPA: origins and purpose; definition of 'mortgage broker'"
+        },
+        {
+          "id": "1.1.2",
+          "label": "RESPA: applicable loan types"
+        },
+        {
+          "id": "1.1.3",
+          "label": "RESPA: prohibitions, limitations, & exemptions"
+        },
+        {
+          "id": "1.1.4",
+          "label": "RESPA: settlement services"
+        },
+        {
+          "id": "1.1.5",
+          "label": "RESPA: required borrower information on application (Reg X)"
+        },
+        {
+          "id": "1.1.6",
+          "label": "RESPA: foreclosure process"
+        },
+        {
+          "id": "1.1.7",
+          "label": "RESPA: initial escrow statements"
+        },
+        {
+          "id": "1.2.1",
+          "label": "ECOA: permissible acts"
+        },
+        {
+          "id": "1.2.2",
+          "label": "ECOA: factors that cannot be used to discriminate"
+        },
+        {
+          "id": "1.2.3",
+          "label": "ECOA: circumstances where loan can be denied"
+        },
+        {
+          "id": "1.2.4",
+          "label": "ECOA: Regulation B"
+        },
+        {
+          "id": "1.2.5",
+          "label": "ECOA: notifying borrower of action taken (timing)"
+        },
+        {
+          "id": "1.2.6",
+          "label": "ECOA: required disclosures when application denied"
+        },
+        {
+          "id": "1.2.7",
+          "label": "ECOA: adverse action definition/examples/notifications/timing"
+        },
+        {
+          "id": "1.2.8",
+          "label": "ECOA: information required on application; definition of 'elderly'"
+        },
+        {
+          "id": "1.2.9",
+          "label": "ECOA: MLO actions when borrower refuses to provide race/gender information"
+        },
+        {
+          "id": "1.2.10",
+          "label": "ECOA: co-signer requirements"
+        },
+        {
+          "id": "1.2.11",
+          "label": "ECOA: acceptable income for loan review"
+        },
+        {
+          "id": "1.2.12",
+          "label": "ECOA: creditworthiness factors"
+        },
+        {
+          "id": "1.3.1",
+          "label": "TILA: purpose"
+        },
+        {
+          "id": "1.3.2",
+          "label": "TILA: loans covered"
+        },
+        {
+          "id": "1.3.3",
+          "label": "TILA: definitions incl APR, finance charge, dwelling, residential mortgage loan"
+        },
+        {
+          "id": "1.3.4",
+          "label": "TILA: notice of right to rescind; refinance rescind scenarios; seller contributions"
+        },
+        {
+          "id": "1.3.5",
+          "label": "TILA: HOEPA high-cost mortgages (1026.32)"
+        },
+        {
+          "id": "1.3.6",
+          "label": "TILA: higher-priced mortgage loans (1026.35)"
+        },
+        {
+          "id": "1.3.7",
+          "label": "TILA: MLO compensation (1026.36(d))"
+        },
+        {
+          "id": "1.4.1",
+          "label": "TRID: purpose"
+        },
+        {
+          "id": "1.4.2",
+          "label": "TRID: loans covered"
+        },
+        {
+          "id": "1.4.3",
+          "label": "TRID: loan estimates - facts, required information, charges/fees"
+        },
+        {
+          "id": "1.4.4",
+          "label": "TRID: definition of 'loan consummation'"
+        },
+        {
+          "id": "1.4.5",
+          "label": "TRID: special information booklet"
+        },
+        {
+          "id": "1.4.6",
+          "label": "TRID: Closing Disclosure"
+        },
+        {
+          "id": "1.4.7",
+          "label": "TRID: disclosures timing"
+        },
+        {
+          "id": "1.4.8",
+          "label": "TRID: MLO actions if TRID disclosure is incomplete"
+        },
+        {
+          "id": "1.4.9",
+          "label": "TRID: change of circumstances"
+        },
+        {
+          "id": "1.4.10",
+          "label": "TRID: information that must be provided to consumer upon request"
+        },
+        {
+          "id": "1.4.11",
+          "label": "TRID: borrower's right to rescission"
+        },
+        {
+          "id": "1.4.12",
+          "label": "TRID: annual escrow statement"
+        },
+        {
+          "id": "1.5.1",
+          "label": "HMDA (Reg C)"
+        },
+        {
+          "id": "1.5.2",
+          "label": "FCRA / FACTA"
+        },
+        {
+          "id": "1.5.3",
+          "label": "FTC Red Flag rules (16 CFR 681)"
+        },
+        {
+          "id": "1.5.4",
+          "label": "Bank Secrecy Act / Anti-Money Laundering (BSA/AML)"
+        },
+        {
+          "id": "1.5.5",
+          "label": "GLBA - Privacy, FTC Safeguards Rule, Do-Not-Call"
+        },
+        {
+          "id": "1.5.6",
+          "label": "Mortgage Acts and Practices - Advertising (Reg N)"
+        },
+        {
+          "id": "1.5.7",
+          "label": "E-Sign Act"
+        },
+        {
+          "id": "1.5.8",
+          "label": "USA PATRIOT Act"
+        },
+        {
+          "id": "1.5.9",
+          "label": "Homeowners' Protection Act (PMI Cancellation Act)"
+        },
+        {
+          "id": "1.5.10",
+          "label": "Dodd-Frank Act"
+        },
+        {
+          "id": "1.6.1",
+          "label": "Regulatory Authority: CFPB"
+        },
+        {
+          "id": "1.6.2",
+          "label": "Regulatory Authority: HUD"
+        }
+      ]
+    },
+    {
+      "code": "STATE",
+      "content_area": "Uniform State",
+      "official_name": "Uniform State Content",
+      "weight": 0.11,
+      "target_count": 39,
+      "leaves": [
+        {
+          "id": "2.1.1",
+          "label": "SAFE Act: general purpose and scope"
+        },
+        {
+          "id": "2.1.2",
+          "label": "SAFE Act: documents to be filed for public record"
+        },
+        {
+          "id": "2.2.1",
+          "label": "State agencies: regulatory powers and responsibilities"
+        },
+        {
+          "id": "2.2.2",
+          "label": "State agencies: NMLS Registry and relationship with state regulators"
+        },
+        {
+          "id": "2.2.3",
+          "label": "State agencies: frequency of exams"
+        },
+        {
+          "id": "2.2.4",
+          "label": "State agencies: MLO unique identifiers"
+        },
+        {
+          "id": "2.2.5",
+          "label": "State agencies: CFPB authority and CFPB LO rule (dual compensation)"
+        },
+        {
+          "id": "2.3.1",
+          "label": "License law: people required to be licensed"
+        },
+        {
+          "id": "2.3.2",
+          "label": "License law: MLO-licensed services"
+        },
+        {
+          "id": "2.3.3",
+          "label": "License law: allowable activities by underwriters, clerical staff, processors"
+        },
+        {
+          "id": "2.3.4",
+          "label": "License law: entities requiring a licensed MLO"
+        },
+        {
+          "id": "2.3.5",
+          "label": "License law: businesses not required to be licensed (depositories)"
+        },
+        {
+          "id": "2.3.6",
+          "label": "License law: qualifications & application (PE, background checks, felony)"
+        },
+        {
+          "id": "2.3.7",
+          "label": "License law: waiting period for test retakes"
+        },
+        {
+          "id": "2.3.8",
+          "label": "License law: sponsorship requirement"
+        },
+        {
+          "id": "2.3.9",
+          "label": "License law: definition of 'MLO'"
+        },
+        {
+          "id": "2.3.10",
+          "label": "License law: grounds for denying a license"
+        },
+        {
+          "id": "2.3.11",
+          "label": "License law: maintenance (renewal, CE, active status, retake if inactive)"
+        },
+        {
+          "id": "2.3.12",
+          "label": "License law: NMLS requirements (employment change, submissions, identifier)"
+        },
+        {
+          "id": "2.3.13",
+          "label": "License law: Temporary Authority to Originate (EGRRCPA)"
+        },
+        {
+          "id": "2.4.1",
+          "label": "Compliance: authority to examine books/records and interview employees"
+        },
+        {
+          "id": "2.4.2",
+          "label": "Compliance: prohibited acts (RE agent ads, supervisor's ID, omitting debt, bait-and-switch)"
+        },
+        {
+          "id": "2.4.3",
+          "label": "Compliance: required conduct (complaint docs, record retention, providing records)"
+        },
+        {
+          "id": "2.4.4",
+          "label": "Compliance: assumable loans"
+        },
+        {
+          "id": "2.4.5",
+          "label": "Compliance: permissible acts"
+        },
+        {
+          "id": "2.4.6",
+          "label": "Compliance: penalties for failure to conduct certain duties"
+        },
+        {
+          "id": "2.4.7",
+          "label": "Compliance: general loan origination scenarios"
+        },
+        {
+          "id": "2.4.8",
+          "label": "Compliance: advertising (NMLS unique identifier requirement)"
+        }
+      ]
+    },
+    {
+      "code": "GEN",
+      "content_area": "General Mortgage Knowledge",
+      "official_name": "General Mortgage Knowledge",
+      "weight": 0.2,
+      "target_count": 70,
+      "leaves": [
+        {
+          "id": "3.1.1",
+          "label": "Qualified mortgages"
+        },
+        {
+          "id": "3.1.2",
+          "label": "Conventional/conforming (incl. Fannie Mae, Freddie Mac)"
+        },
+        {
+          "id": "3.1.3",
+          "label": "Government (FHA, VA, USDA)"
+        },
+        {
+          "id": "3.1.4",
+          "label": "Conventional/nonconforming (jumbo, Alt-A, subprime, nontraditional risk, non-QM)"
+        },
+        {
+          "id": "3.2.1",
+          "label": "Fixed-rate mortgages"
+        },
+        {
+          "id": "3.2.2",
+          "label": "Adjustable-rate mortgages (ARMs)"
+        },
+        {
+          "id": "3.2.3",
+          "label": "Purchase money second mortgages"
+        },
+        {
+          "id": "3.2.4",
+          "label": "Balloon mortgages"
+        },
+        {
+          "id": "3.2.5",
+          "label": "Reverse mortgages"
+        },
+        {
+          "id": "3.2.6",
+          "label": "Home equity line of credit (HELOC)"
+        },
+        {
+          "id": "3.2.7",
+          "label": "Construction mortgages"
+        },
+        {
+          "id": "3.2.8",
+          "label": "Interest-only mortgages"
+        },
+        {
+          "id": "3.3.1",
+          "label": "Loan terms (subordinate loans, escrow, lien, tolerances, rate lock, table funding)"
+        },
+        {
+          "id": "3.3.2",
+          "label": "Disclosure terms (yield spread premiums, servicing transfers, lender credits)"
+        },
+        {
+          "id": "3.3.3",
+          "label": "Financial terms (discount points, 2-1 buydown, LTV, accrued interest, daily simple interest)"
+        },
+        {
+          "id": "3.3.4",
+          "label": "General terms (subordination, conveyance, primary/secondary market, assumable, APR)"
+        }
+      ]
+    },
+    {
+      "code": "ORIG",
+      "content_area": "Origination Activities",
+      "official_name": "Mortgage Loan Origination Activities",
+      "weight": 0.27,
+      "target_count": 95,
+      "leaves": [
+        {
+          "id": "4.1.1",
+          "label": "Loan inquiry process - includes required disclosures"
+        },
+        {
+          "id": "4.1.2",
+          "label": "Borrower application (accepting, offering/negotiating terms, managing info, permissible questions, gift donors)"
+        },
+        {
+          "id": "4.1.3",
+          "label": "Verification (authorization forms, % of assets, verifying employment)"
+        },
+        {
+          "id": "4.1.4",
+          "label": "Suitability of products & programs"
+        },
+        {
+          "id": "4.1.5",
+          "label": "Accuracy/tolerances (violations, zero-tolerance, 10% tolerance)"
+        },
+        {
+          "id": "4.1.6",
+          "label": "Disclosure timing (KBYO, notification of action taken, early disclosures, ABAs)"
+        },
+        {
+          "id": "4.1.7",
+          "label": "Loan Estimate timing (initial, revised, expiration, tolerance corrections)"
+        },
+        {
+          "id": "4.1.8",
+          "label": "Closing Disclosure (Homeownership Counseling Disclosure)"
+        },
+        {
+          "id": "4.2.1",
+          "label": "Borrower analysis (assets, liabilities, income, credit report, qualifying ratios, ability to repay)"
+        },
+        {
+          "id": "4.2.2",
+          "label": "Appraisals (purpose, approaches, timing, independence)"
+        },
+        {
+          "id": "4.2.3",
+          "label": "Title report (obtaining, timing, preliminary)"
+        },
+        {
+          "id": "4.2.4",
+          "label": "Insurance (flood, PMI, hazard/homeowner, government mortgage insurance)"
+        },
+        {
+          "id": "4.3.1",
+          "label": "Closing: title and title insurance"
+        },
+        {
+          "id": "4.3.2",
+          "label": "Closing: settlement/closing agent (eligible signatures, power of attorney)"
+        },
+        {
+          "id": "4.3.3",
+          "label": "Closing: explanation of fees (HUD-1, title insurance, pre-paids, escrow, origination fees)"
+        },
+        {
+          "id": "4.3.4",
+          "label": "Closing: required closing documents"
+        },
+        {
+          "id": "4.3.5",
+          "label": "Closing: funding - rescission periods"
+        },
+        {
+          "id": "4.4.1",
+          "label": "Financial calc: periodic interest"
+        },
+        {
+          "id": "4.4.2",
+          "label": "Financial calc: monthly payments"
+        },
+        {
+          "id": "4.4.3",
+          "label": "Financial calc: down payments"
+        },
+        {
+          "id": "4.4.4",
+          "label": "Financial calc: closing costs/prepaids"
+        },
+        {
+          "id": "4.4.5",
+          "label": "Financial calc: ARM adjustments - rates and payments"
+        }
+      ]
+    },
+    {
+      "code": "ETH",
+      "content_area": "Ethics",
+      "official_name": "Ethics",
+      "weight": 0.18,
+      "target_count": 63,
+      "leaves": [
+        {
+          "id": "5.1.1",
+          "label": "Prohibited acts (redlining, RESPA prohibitions, kickbacks/compensation, permitted/prohibited duties)"
+        },
+        {
+          "id": "5.1.2",
+          "label": "Fairness in lending (referral, coercion, appraiser conflict of interest, discrimination)"
+        },
+        {
+          "id": "5.1.3",
+          "label": "Fraud detection (asset/income/employment fraud, contract/application red flags, occupancy fraud)"
+        },
+        {
+          "id": "5.1.4",
+          "label": "Suspicious activity; info not provided to borrower; verifying application information"
+        },
+        {
+          "id": "5.1.5",
+          "label": "Advertising (misleading info, due diligence, UDAAP, federal regulation)"
+        },
+        {
+          "id": "5.1.6",
+          "label": "Predatory lending and steering"
+        },
+        {
+          "id": "5.2.1",
+          "label": "Financial responsibility (permitted fees/comp, fee changes, referral fees, fee splitting)"
+        },
+        {
+          "id": "5.2.2",
+          "label": "Handling borrower complaints"
+        },
+        {
+          "id": "5.2.3",
+          "label": "Mortgage company compliance (material info discovery, info from employers)"
+        },
+        {
+          "id": "5.2.4",
+          "label": "Relationships with consumers (personal info/cybersecurity, conflicts, POA, deposits, appraiser interactions, multiple applications, falsified info, advice, outside parties)"
+        }
+      ]
+    }
+  ]
+}
