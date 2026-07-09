@@ -1,5 +1,7 @@
 import Link from "next/link";
+import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
+import { hasEntitlement } from "@/lib/entitlements";
 
 // Server component — renders on the server for SEO. This is the marketing
 // surface that should rank organically and feed the free diagnostic funnel.
@@ -8,6 +10,9 @@ export default async function Home() {
   const {
     data: { user },
   } = await supabase.auth.getUser();
+
+  // Paying users don't need the pitch — send them straight to their dashboard.
+  if (user && (await hasEntitlement())) redirect("/dashboard");
 
   return (
     <main style={{ maxWidth: 760, margin: "0 auto", padding: "48px 20px" }}>

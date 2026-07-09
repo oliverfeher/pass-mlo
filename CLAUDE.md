@@ -76,6 +76,14 @@ then `npm run seed` to push to the DB.
 - The full bank is gated behind an account **and** an `entitlements` row. Grant it
   manually for testing (see below); Stripe is on placeholder keys locally.
 - Full-length exam sessions supported (session cap raised to 120; exam mode defaults to 115).
+- **Dashboard (`/dashboard`)**: durable per-area mastery bars, overall readiness, questions-
+  answered + day-streak, a category picker (multi-select → focused session), a one-click
+  **Smart mix** (weak-area + exam-weight weighted), a **Review missed** queue, and a **Timed
+  exam** launcher. Entitled users are redirected here from `/`. All progress is derived from
+  `session_items` (no new tables) — see `src/lib/progress.ts` + `src/lib/selection.ts`.
+- **Practice selection**: `/practice` now accepts `?areas=A,B` (multi), `?mix=weak` (smart),
+  `?review=1` (missed queue), and `?timed=1` (exam countdown, ~90s/question). Questions are
+  now *sampled* server-side so repeat sessions vary (previously returned the same first N).
 - **Recently fixed (for real):** `PracticeRunner.tsx` shuffled during render → React
   hydration mismatch. The shuffle had been in a `useMemo` (still runs during render on
   both server and client, so `Math.random()` diverged). It now runs in a client-only
@@ -105,12 +113,12 @@ on conflict (user_id, product) do nothing;
 
 ## Known next steps (roadmap)
 
-- **Timed-exam UI**: add the clock + a full-length exam entry point on the existing
-  `exam` mode in PracticeRunner.
-- **Mastery dashboard**: aggregate `session_items` into per-area/per-subtopic mastery
-  that persists across sessions (the readiness signal, but durable).
-- **Review queue**: re-drill missed questions until answered correctly N times.
+- ✅ **Timed-exam UI** — done (countdown in PracticeRunner, launched from dashboard).
+- ✅ **Mastery dashboard** — done (per-area; per-*subtopic* still TODO if wanted).
+- ✅ **Review queue** — done (most-recent-wrong drops out on next correct answer). Next
+  step if desired: require N-consecutive-correct before a question graduates.
 - **Spaced repetition** (v1.1): the `srs_state` table is anticipated in the schema notes.
+- **Flag for review**: let users manually mark a question to revisit (needs a small table/col).
 - **Content**: last stretch to the 351 target if desired; then depth per node.
 - **Deploy**: Vercel + Supabase + Stripe (one-time Price, webhook → entitlement).
 - **CI**: GitHub Action running `npm run qa` + `npm run coverage` on every push so a

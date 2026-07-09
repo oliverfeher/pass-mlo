@@ -1,17 +1,30 @@
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { hasEntitlement } from "@/lib/entitlements";
+import { fetchProgress, missedIds } from "@/lib/progress";
+import { AREA_KEYS } from "@/lib/areas";
+import { sample, buildSmartMix } from "@/lib/selection";
 import PracticeRunner, { type Question } from "@/components/PracticeRunner";
+
+const COLS = "id,content_area,subtopic,stem,options,correct_index,explanation";
 
 // Server component: decides what the user is allowed to see, then hands a
 // question set to the client runner. RLS is the real gate; this mirrors it in UI.
 export default async function PracticePage({
   searchParams,
 }: {
-  searchParams: { mode?: string; area?: string; length?: string };
+  searchParams: { mode?: string; area?: string; areas?: string; length?: string; mix?: string; review?: string; timed?: string };
 }) {
   const mode = (searchParams.mode as "practice" | "exam" | "diagnostic") ?? "practice";
   const area = searchParams.area;
+  // `areas` (comma-separated) is the multi-select form; `area` kept for back-compat.
+  const areas = (searchParams.areas ?? area ?? "")
+    .split(",")
+    .map((s) => s.trim())
+    .filter((s) => AREA_KEYS.includes(s));
+  const mix = searchParams.mix;       // "weak" = Smart mix
+  const review = searchParams.review === "1";
+  const timed = searchParams.timed === "1";
   const defaultLen = mode === "diagnostic" ? 10 : mode === "exam" ? 115 : 15;
   const length = Math.min(Number(searchParams.length) || defaultLen, 120);
 
@@ -55,17 +68,43 @@ export default async function PracticePage({
     );
   }
 
-  let query = supabase
-    .from("questions")
-    .select("id,content_area,subtopic,stem,options,correct_index,explanation");
-  if (area) query = query.eq("content_area", area);
-  const { data } = await query.limit(length);
+  const runnerMode = mode === "exam" ? "exam" : "practice";
+  let selected: Question[] = [];
+
+  if (review) {
+    // Re-drill questions whose most recent attempt was wrong.
+    const prog = await fetchProgress(supabase, user.id);
+    const ids = missedIds(prog.items);
+    if (ids.length) {
+      const { data } = await supabase.from("questions").select(COLS).in("id", ids);
+      selected = sample((data ?? []) as Question[], length);
+    }
+  } else if (mix === "weak") {
+    // Smart mix: weight toward weak areas + exam weighting.
+    const prog = await fetchProgress(supabase, user.id);
+    const accuracy: Record<string, number | null> = {};
+    for (const key of AREA_KEYS) {
+      const s = prog.byArea[key];
+      accuracy[key] = s?.total ? s.correct / s.total : null;
+    }
+    const { data } = await supabase.from("questions").select(COLS);
+    selected = buildSmartMix((data ?? []) as Question[], accuracy, length);
+  } else {
+    // Area(s) filter, or all areas. Sample so sessions vary run to run.
+    let query = supabase.from("questions").select(COLS);
+    if (areas.length) query = query.in("content_area", areas);
+    const { data } = await query;
+    selected = sample((data ?? []) as Question[], length);
+  }
+
+  const timedSeconds = timed && runnerMode === "exam" ? selected.length * 90 : undefined;
 
   return (
     <PracticeRunner
-      mode={mode === "exam" ? "exam" : "practice"}
-      initialQuestions={(data ?? []) as Question[]}
+      mode={runnerMode}
+      initialQuestions={selected}
       persist
+      timedSeconds={timedSeconds}
     />
   );
 }

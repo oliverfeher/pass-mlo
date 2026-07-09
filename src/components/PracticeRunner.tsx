@@ -15,6 +15,12 @@ export type Question = {
 
 const LETTERS = ["A", "B", "C", "D", "E"];
 
+function fmtTime(s: number): string {
+  const m = Math.floor(s / 60);
+  const sec = s % 60;
+  return `${m}:${String(sec).padStart(2, "0")}`;
+}
+
 function shuffle<T>(arr: T[]): T[] {
   const a = [...arr];
   for (let i = a.length - 1; i > 0; i--) {
@@ -28,10 +34,12 @@ export default function PracticeRunner({
   mode,
   initialQuestions,
   persist,
+  timedSeconds,
 }: {
   mode: "practice" | "exam" | "diagnostic";
   initialQuestions: Question[];
   persist: boolean;
+  timedSeconds?: number;
 }) {
   const supabase = useMemo(() => createClient(), []);
   const sessionIdRef = useRef<string | null>(null);
@@ -57,6 +65,7 @@ export default function PracticeRunner({
   const [answers, setAnswers] = useState<Record<number, number>>({});
   const [revealed, setRevealed] = useState<Record<number, boolean>>({});
   const [done, setDone] = useState(false);
+  const [remaining, setRemaining] = useState<number | null>(timedSeconds ?? null);
 
   async function ensureSession() {
     if (!persist || sessionIdRef.current) return;
@@ -102,6 +111,16 @@ export default function PracticeRunner({
     }
   }
 
+  async function finalize() {
+    if (persist && sessionIdRef.current) {
+      await supabase
+        .from("sessions")
+        .update({ finished_at: new Date().toISOString() })
+        .eq("id", sessionIdRef.current);
+    }
+    setDone(true);
+  }
+
   async function next() {
     if (!session) return;
     if (mode === "exam") {
@@ -109,16 +128,20 @@ export default function PracticeRunner({
       if (answers[idx] !== undefined) void recordItem(q, answers[idx], idx);
     }
     if (idx < session.length - 1) setIdx(idx + 1);
-    else {
-      if (persist && sessionIdRef.current) {
-        await supabase
-          .from("sessions")
-          .update({ finished_at: new Date().toISOString() })
-          .eq("id", sessionIdRef.current);
-      }
-      setDone(true);
-    }
+    else await finalize();
   }
+
+  // Exam countdown. Starts once questions have loaded; auto-submits at zero.
+  useEffect(() => {
+    if (remaining === null || done || !session) return;
+    if (remaining <= 0) {
+      void finalize();
+      return;
+    }
+    const t = setTimeout(() => setRemaining((r) => (r === null ? r : r - 1)), 1000);
+    return () => clearTimeout(t);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [remaining, done, session]);
 
   if (session === null) {
     return <Shell><p style={{ color: "#5A6478" }}>Loading questions…</p></Shell>;
@@ -166,6 +189,16 @@ export default function PracticeRunner({
             </a>
           </div>
         )}
+        {persist && (
+          <div style={{ marginTop: 24, display: "flex", gap: 10, justifyContent: "center", flexWrap: "wrap" }}>
+            <a href="/dashboard" style={{ background: "#A9781F", color: "#fff", padding: "12px 22px", borderRadius: 10, fontWeight: 600, textDecoration: "none" }}>
+              Back to dashboard
+            </a>
+            <a href="/practice?review=1&length=20" style={{ padding: "12px 22px", borderRadius: 10, fontWeight: 600, textDecoration: "none", border: "1.5px solid #E4DDCF", color: "#15233B" }}>
+              Review missed
+            </a>
+          </div>
+        )}
       </Shell>
     );
   }
@@ -178,6 +211,21 @@ export default function PracticeRunner({
 
   return (
     <Shell>
+      {remaining !== null && (
+        <div
+          style={{
+            display: "flex", justifyContent: "space-between", alignItems: "center",
+            marginBottom: 12, padding: "8px 12px", borderRadius: 9,
+            background: remaining <= 60 ? "#F6E7E1" : "#F3F1EC",
+            border: `1px solid ${remaining <= 60 ? "#B2422A" : "#E4DDCF"}`,
+          }}
+        >
+          <span style={{ fontSize: 12, color: "#5A6478", textTransform: "uppercase", letterSpacing: 1 }}>Time left</span>
+          <span style={{ fontVariantNumeric: "tabular-nums", fontWeight: 800, fontSize: 18, color: remaining <= 60 ? "#B2422A" : "#15233B" }}>
+            {fmtTime(remaining)}
+          </span>
+        </div>
+      )}
       <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 10, fontSize: 13, color: "#5A6478" }}>
         <span>Question {idx + 1} of {session.length}</span>
         <span style={{ color: "#A9781F", fontWeight: 700, textTransform: "uppercase", fontSize: 11 }}>{q.content_area}</span>
