@@ -1,5 +1,5 @@
 "use client";
-import { useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { areaBreakdown, overallPct, PASS_BAR, READY_BAR } from "@/lib/scoring";
 
@@ -36,16 +36,21 @@ export default function PracticeRunner({
   const supabase = useMemo(() => createClient(), []);
   const sessionIdRef = useRef<string | null>(null);
 
-  // Shuffle question order and option order once, remapping the correct index.
-  const session = useMemo(() => {
-    return shuffle(initialQuestions).map((q) => {
-      const order = shuffle(q.options.map((_, i) => i));
-      return {
-        ...q,
-        options: order.map((i) => q.options[i]),
-        correct_index: order.indexOf(q.correct_index),
-      };
-    });
+  // Shuffle question + option order once, client-only. Doing this during render
+  // (e.g. in useMemo) reruns Math.random() on both server and client and produces
+  // a React hydration mismatch — keep all randomness in this effect.
+  const [session, setSession] = useState<Question[] | null>(null);
+  useEffect(() => {
+    setSession(
+      shuffle(initialQuestions).map((q) => {
+        const order = shuffle(q.options.map((_, i) => i));
+        return {
+          ...q,
+          options: order.map((i) => q.options[i]),
+          correct_index: order.indexOf(q.correct_index),
+        };
+      })
+    );
   }, [initialQuestions]);
 
   const [idx, setIdx] = useState(0);
@@ -85,6 +90,7 @@ export default function PracticeRunner({
   }
 
   function choose(optIdx: number) {
+    if (!session) return;
     const q = session[idx];
     if (mode === "practice" || mode === "diagnostic") {
       if (revealed[idx]) return;
@@ -97,6 +103,7 @@ export default function PracticeRunner({
   }
 
   async function next() {
+    if (!session) return;
     if (mode === "exam") {
       const q = session[idx];
       if (answers[idx] !== undefined) void recordItem(q, answers[idx], idx);
@@ -111,6 +118,10 @@ export default function PracticeRunner({
       }
       setDone(true);
     }
+  }
+
+  if (session === null) {
+    return <Shell><p style={{ color: "#5A6478" }}>Loading questions…</p></Shell>;
   }
 
   if (!session.length) {

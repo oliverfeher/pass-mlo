@@ -76,9 +76,12 @@ then `npm run seed` to push to the DB.
 - The full bank is gated behind an account **and** an `entitlements` row. Grant it
   manually for testing (see below); Stripe is on placeholder keys locally.
 - Full-length exam sessions supported (session cap raised to 120; exam mode defaults to 115).
-- **Recently fixed:** `PracticeRunner.tsx` shuffled during render → React hydration
-  mismatch. Shuffle now runs in a `useEffect` (client-only) with a "Loading questions…"
-  state. If you touch that file, keep randomness/time out of render.
+- **Recently fixed (for real):** `PracticeRunner.tsx` shuffled during render → React
+  hydration mismatch. The shuffle had been in a `useMemo` (still runs during render on
+  both server and client, so `Math.random()` diverged). It now runs in a client-only
+  `useEffect` that sets `session` state, with `session: Question[] | null` and a
+  "Loading questions…" state on the initial (`null`) render. If you touch that file,
+  keep randomness/time out of render — no `Math.random()`/`Date` in render or `useMemo`.
 
 ## Local dev
 
