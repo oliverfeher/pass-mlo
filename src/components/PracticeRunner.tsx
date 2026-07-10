@@ -2,6 +2,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { areaBreakdown, overallPct, PASS_BAR, READY_BAR } from "@/lib/scoring";
+import ReportButton from "./ReportButton";
 
 export type Question = {
   id: string;
@@ -281,6 +282,8 @@ export default function PracticeRunner({
       >
         {idx === session.length - 1 ? "Finish & see results" : "Next question"}
       </button>
+
+      {persist && <ReportButton key={q.id} questionId={q.id} />}
     </Shell>
   );
 }
