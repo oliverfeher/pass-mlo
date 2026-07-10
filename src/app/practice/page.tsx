@@ -5,7 +5,7 @@ import { fetchProgress, missedIds } from "@/lib/progress";
 import { dueQuestionIds } from "@/lib/srs";
 import { AREA_KEYS } from "@/lib/areas";
 import { TYPE_KEYS, DIFFICULTY_KEYS } from "@/lib/qmeta";
-import { sample, buildSmartMix } from "@/lib/selection";
+import { sample, buildSmartMix, seededSample } from "@/lib/selection";
 import PracticeRunner, { type Question } from "@/components/PracticeRunner";
 
 const COLS = "id,content_area,subtopic,stem,options,correct_index,explanation,type,difficulty";
@@ -15,7 +15,7 @@ const COLS = "id,content_area,subtopic,stem,options,correct_index,explanation,ty
 export default async function PracticePage({
   searchParams,
 }: {
-  searchParams: { mode?: string; area?: string; areas?: string; length?: string; mix?: string; review?: string; srs?: string; timed?: string; type?: string; difficulty?: string };
+  searchParams: { mode?: string; area?: string; areas?: string; length?: string; mix?: string; review?: string; srs?: string; daily?: string; timed?: string; type?: string; difficulty?: string };
 }) {
   const mode = (searchParams.mode as "practice" | "exam" | "diagnostic") ?? "practice";
   const area = searchParams.area;
@@ -27,6 +27,7 @@ export default async function PracticePage({
   const mix = searchParams.mix;       // "weak" = Smart mix
   const review = searchParams.review === "1";
   const srs = searchParams.srs === "1"; // spaced-repetition "due today"
+  const daily = searchParams.daily === "1"; // date-seeded daily challenge
   const timed = searchParams.timed === "1";
   const type = TYPE_KEYS.includes(searchParams.type ?? "") ? searchParams.type! : null;
   const difficulty = DIFFICULTY_KEYS.includes(searchParams.difficulty ?? "") ? searchParams.difficulty! : null;
@@ -76,7 +77,12 @@ export default async function PracticePage({
   const runnerMode = mode === "exam" ? "exam" : "practice";
   let selected: Question[] = [];
 
-  if (srs) {
+  if (daily) {
+    // Daily challenge: same deterministic set for everyone all day, fresh daily.
+    const todayISO = new Date().toISOString().slice(0, 10);
+    const { data } = await supabase.from("questions").select(COLS);
+    selected = seededSample((data ?? []) as Question[], length, todayISO);
+  } else if (srs) {
     // Spaced repetition: questions whose review interval has elapsed, most
     // overdue first (order preserved, not sampled).
     const prog = await fetchProgress(supabase, user.id);

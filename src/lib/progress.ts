@@ -5,6 +5,7 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 
 export type ProgressItem = {
   question_id: string;
+  session_id: string;
   is_correct: boolean | null;
   answered_at: string;
   content_area: string;
@@ -26,11 +27,12 @@ export async function fetchProgress(
 ): Promise<Progress> {
   const { data } = await supabase
     .from("session_items")
-    .select("question_id, is_correct, answered_at, questions(content_area, type, difficulty)")
+    .select("question_id, session_id, is_correct, answered_at, questions(content_area, type, difficulty)")
     .eq("user_id", userId);
 
   const items: ProgressItem[] = (data ?? []).map((r: any) => ({
     question_id: r.question_id,
+    session_id: r.session_id,
     is_correct: r.is_correct,
     answered_at: r.answered_at,
     content_area: r.questions?.content_area ?? "Unknown",

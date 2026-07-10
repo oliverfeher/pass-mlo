@@ -5,6 +5,8 @@ import { fetchProgress, missedIds, currentStreak } from "@/lib/progress";
 import { dueQuestionIds } from "@/lib/srs";
 import { AREAS } from "@/lib/areas";
 import { breakdown, TYPES, DIFFICULTIES } from "@/lib/qmeta";
+import { dailyAccuracy, timePerQuestion } from "@/lib/trends";
+import ProgressChart from "@/components/ProgressChart";
 import { computeReadiness, bandColor, PASS_BAR } from "@/lib/readiness";
 import { daysUntil, studyPace } from "@/lib/plan";
 import CategoryPicker, { type AreaRow } from "@/components/CategoryPicker";
@@ -47,6 +49,8 @@ export default async function DashboardPage() {
   const areasReady = readiness.areas.filter((a) => a.confident && a.estPct >= PASS_BAR).length;
   const typeCuts = breakdown(prog.items, TYPES, (it) => it.type);
   const diffCuts = breakdown(prog.items, DIFFICULTIES, (it) => it.difficulty);
+  const series = dailyAccuracy(prog.items);
+  const timeStats = timePerQuestion(prog.items);
 
   // Exam-date countdown + pace (exam date stored in user metadata).
   const TARGET_PER_AREA = 25;
@@ -155,7 +159,13 @@ export default async function DashboardPage() {
       </section>
 
       {/* Quick actions */}
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginTop: 16 }}>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(150px, 1fr))", gap: 12, marginTop: 16 }}>
+        <ActionCard
+          href="/practice?daily=1&length=10"
+          title="Daily challenge"
+          body="10 fresh questions today"
+          accent="#A9781F"
+        />
         <ActionCard
           href="/practice?review=1&length=20"
           title="Review missed"
@@ -182,6 +192,20 @@ export default async function DashboardPage() {
             <CutGroup title="By type" cuts={typeCuts} param="type" />
             <CutGroup title="By difficulty" cuts={diffCuts} param="difficulty" />
           </div>
+        </section>
+      )}
+
+      {/* Progress over time */}
+      {series.length >= 2 && (
+        <section style={{ ...card, marginTop: 16 }}>
+          <h2 style={h2}>Your progress</h2>
+          <p style={{ margin: "0 0 14px", color: "#5A6478", fontSize: 14 }}>Accuracy by day.</p>
+          <ProgressChart series={series} />
+          {timeStats && (
+            <p style={{ margin: "12px 0 0", fontSize: 12.5, color: "#5A6478", textAlign: "center" }}>
+              ~{timeStats.medianSec}s per question, typically <span style={{ color: "#98A0AE" }}>(approx, {timeStats.sampleSize} answers)</span>
+            </p>
+          )}
         </section>
       )}
     </main>
