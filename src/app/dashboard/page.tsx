@@ -3,8 +3,10 @@ import { createClient } from "@/lib/supabase/server";
 import { hasEntitlement } from "@/lib/entitlements";
 import { fetchProgress, missedIds, currentStreak } from "@/lib/progress";
 import { AREAS } from "@/lib/areas";
-import { PASS_BAR, READY_BAR } from "@/lib/scoring";
+import { computeReadiness, bandColor, PASS_BAR } from "@/lib/readiness";
 import CategoryPicker, { type AreaRow } from "@/components/CategoryPicker";
+
+const SHORT = Object.fromEntries(AREAS.map((a) => [a.key, a.short]));
 
 export const dynamic = "force-dynamic";
 
@@ -29,7 +31,15 @@ export default async function DashboardPage() {
   const todayISO = new Date().toISOString().slice(0, 10);
   const streak = currentStreak(prog.answeredDates, todayISO);
   const missed = missedIds(prog.items).length;
-  const overall = prog.totalAnswered ? Math.round((prog.totalCorrect / prog.totalAnswered) * 100) : null;
+  const readiness = computeReadiness(
+    AREAS.map((a) => ({
+      key: a.key,
+      weight: a.weight,
+      correct: prog.byArea[a.key]?.correct ?? 0,
+      total: prog.byArea[a.key]?.total ?? 0,
+    }))
+  );
+  const areasReady = readiness.areas.filter((a) => a.confident && a.estPct >= PASS_BAR).length;
 
   const rows: AreaRow[] = AREAS.map((a) => {
     const s = prog.byArea[a.key];
@@ -50,15 +60,38 @@ export default async function DashboardPage() {
         </Link>
       </div>
 
-      {/* Readiness + engagement */}
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 10, margin: "18px 0 26px" }}>
-        <Stat
-          big={overall === null ? "—" : `${overall}%`}
-          label={overall === null ? "no answers yet" : overall >= READY_BAR ? "ready — above the bar" : overall >= PASS_BAR ? "at the bar" : `below ${PASS_BAR}% bar`}
-          color={overall === null ? "#5A6478" : overall >= PASS_BAR ? "#2E7A57" : "#B2422A"}
-        />
+      {/* Readiness banner */}
+      <section style={{ ...card, margin: "18px 0 12px" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 20, flexWrap: "wrap" }}>
+          <div style={{ textAlign: "center", minWidth: 92 }}>
+            <div style={{ fontSize: 46, fontWeight: 800, color: bandColor(readiness.band), letterSpacing: -1.5, lineHeight: 1 }}>
+              {readiness.score}%
+            </div>
+            <div style={{ fontSize: 11, color: "#5A6478", textTransform: "uppercase", letterSpacing: 1, marginTop: 4 }}>readiness</div>
+          </div>
+          <div style={{ flex: 1, minWidth: 220 }}>
+            <div style={{ fontWeight: 700, color: bandColor(readiness.band), marginBottom: 8, fontSize: 15.5 }}>{readiness.label}</div>
+            <div style={{ fontSize: 12.5, color: "#5A6478", marginBottom: 5 }}>
+              Confidence {Math.round(readiness.confidence * 100)}% · passing bar {PASS_BAR}%
+            </div>
+            <div style={{ height: 6, background: "#EAE4D7", borderRadius: 99, overflow: "hidden" }}>
+              <div style={{ width: `${Math.round(readiness.confidence * 100)}%`, height: "100%", background: "#15233B" }} />
+            </div>
+            {readiness.thinAreas.length > 0 && (
+              <p style={{ margin: "10px 0 0", fontSize: 12.5, color: "#5A6478", lineHeight: 1.5 }}>
+                Sharpen this estimate — practice more{" "}
+                {readiness.thinAreas.map((a) => SHORT[a.key]).join(", ")}.
+              </p>
+            )}
+          </div>
+        </div>
+      </section>
+
+      {/* Engagement */}
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 10, margin: "0 0 26px" }}>
         <Stat big={String(prog.totalAnswered)} label="questions answered" color="#15233B" />
-        <Stat big={streak > 0 ? `${streak}🔥` : "0"} label={streak === 1 ? "day streak" : "day streak"} color="#15233B" />
+        <Stat big={streak > 0 ? `${streak}🔥` : "0"} label="day streak" color="#15233B" />
+        <Stat big={`${areasReady}/5`} label="areas at the bar" color={areasReady >= 5 ? "#2E7A57" : "#15233B"} />
       </div>
 
       {/* Focus / mix */}
