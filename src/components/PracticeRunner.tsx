@@ -5,6 +5,7 @@ import { areaBreakdown, overallPct, PASS_BAR, READY_BAR } from "@/lib/scoring";
 import { TYPES } from "@/lib/qmeta";
 import { splitTraps, hasTraps } from "@/lib/traps";
 import ReportButton from "./ReportButton";
+import LeadCapture from "./LeadCapture";
 
 export type Question = {
   id: string;
@@ -337,11 +338,34 @@ export default function PracticeRunner({
         )}
 
         {mode === "diagnostic" && (
-          <div style={{ marginTop: 24, textAlign: "center" }}>
-            <a href="/pricing" style={{ background: "#A9781F", color: "#fff", padding: "13px 24px", borderRadius: 10, fontWeight: 600, textDecoration: "none" }}>
-              Unlock the full bank
-            </a>
-          </div>
+          <>
+            <div style={{ marginTop: 24, padding: "18px 18px", borderRadius: 12, background: "#FBF7EE", border: "1px solid #E4DDCF" }}>
+              <h3 style={{ fontSize: 16, margin: "0 0 8px" }}>Your study plan</h3>
+              {(() => {
+                const weak = [...areas].sort((a, b) => a.pct - b.pct).slice(0, 2);
+                return (
+                  <p style={{ margin: 0, fontSize: 14, lineHeight: 1.6, color: "#33404F" }}>
+                    {passed
+                      ? "You're near the bar already. Tighten your weakest areas, then run full timed exams to build a cushion:"
+                      : "Here's where to focus first — your two weakest areas carry a lot of exam weight:"}
+                    <br />
+                    {weak.map((w, i) => (
+                      <span key={w.area} style={{ fontWeight: 600 }}>
+                        {i > 0 ? " · " : ""}{w.area} ({w.pct}%)
+                      </span>
+                    ))}
+                    . With the full bank you get spaced repetition, a weak-area Smart mix, and timed simulations to close these gaps.
+                  </p>
+                );
+              })()}
+            </div>
+            <div style={{ marginTop: 16, textAlign: "center" }}>
+              <a href="/pricing" style={{ background: "#A9781F", color: "#fff", padding: "13px 24px", borderRadius: 10, fontWeight: 600, textDecoration: "none" }}>
+                Unlock the full bank
+              </a>
+            </div>
+            <LeadCapture source="diagnostic" />
+          </>
         )}
         {persist && (
           <div style={{ marginTop: 24, display: "flex", gap: 10, justifyContent: "center", flexWrap: "wrap" }}>
