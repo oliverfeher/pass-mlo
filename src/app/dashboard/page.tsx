@@ -38,6 +38,16 @@ export default async function DashboardPage() {
   const streak = currentStreak(prog.answeredDates, todayISO);
   const missed = missedIds(prog.items).length;
   const dueCount = dueQuestionIds(prog.items, Date.now()).length;
+  // Isolated, best-effort queries — these tables/columns arrive in migration
+  // 0003; until then they error to null and the features simply read as empty.
+  const { data: bmRows } = await supabase.from("bookmarks").select("question_id");
+  const bookmarkCount = (bmRows ?? []).length;
+  const { count: confWrong } = await supabase
+    .from("session_items")
+    .select("*", { count: "exact", head: true })
+    .eq("user_id", user.id)
+    .eq("confidence", 3)
+    .eq("is_correct", false);
   const readiness = computeReadiness(
     AREAS.map((a) => ({
       key: a.key,
@@ -174,12 +184,31 @@ export default async function DashboardPage() {
           accent="#B2422A"
         />
         <ActionCard
+          href="/practice?bookmarks=1&length=20"
+          title="Bookmarked"
+          body={bookmarkCount > 0 ? `${bookmarkCount} saved question${bookmarkCount === 1 ? "" : "s"}` : "Star questions to save them"}
+          disabled={bookmarkCount === 0}
+          accent="#A9781F"
+        />
+        <ActionCard
+          href="/practice?confidence=1&length=15"
+          title="Confidence check"
+          body="Rate how sure you are as you go"
+          accent="#2E7A57"
+        />
+        <ActionCard
           href="/practice?mode=exam&length=115&timed=1"
           title="Timed exam"
           body="115 questions · full simulation"
           accent="#15233B"
         />
       </div>
+
+      {confWrong ? (
+        <p style={{ margin: "14px 2px 0", fontSize: 13, color: "#B2422A" }}>
+          ⚠ You were <strong>certain but wrong</strong> on {confWrong} question{confWrong === 1 ? "" : "s"} — your most dangerous gaps. They&rsquo;ll resurface in review.
+        </p>
+      ) : null}
 
       {/* By type / difficulty — the scenario questions are where people fail */}
       {(typeCuts.length > 0 || diffCuts.length > 0) && (

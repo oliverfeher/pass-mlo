@@ -15,7 +15,7 @@ const COLS = "id,content_area,subtopic,stem,options,correct_index,explanation,ty
 export default async function PracticePage({
   searchParams,
 }: {
-  searchParams: { mode?: string; area?: string; areas?: string; length?: string; mix?: string; review?: string; srs?: string; daily?: string; timed?: string; type?: string; difficulty?: string };
+  searchParams: { mode?: string; area?: string; areas?: string; length?: string; mix?: string; review?: string; srs?: string; daily?: string; bookmarks?: string; confidence?: string; timed?: string; type?: string; difficulty?: string };
 }) {
   const mode = (searchParams.mode as "practice" | "exam" | "diagnostic") ?? "practice";
   const area = searchParams.area;
@@ -28,6 +28,8 @@ export default async function PracticePage({
   const review = searchParams.review === "1";
   const srs = searchParams.srs === "1"; // spaced-repetition "due today"
   const daily = searchParams.daily === "1"; // date-seeded daily challenge
+  const bookmarksMode = searchParams.bookmarks === "1";
+  const confidence = searchParams.confidence === "1";
   const timed = searchParams.timed === "1";
   const type = TYPE_KEYS.includes(searchParams.type ?? "") ? searchParams.type! : null;
   const difficulty = DIFFICULTY_KEYS.includes(searchParams.difficulty ?? "") ? searchParams.difficulty! : null;
@@ -77,7 +79,15 @@ export default async function PracticePage({
   const runnerMode = mode === "exam" ? "exam" : "practice";
   let selected: Question[] = [];
 
-  if (daily) {
+  if (bookmarksMode) {
+    // Bookmarked questions (best-effort; empty if the table isn't there yet).
+    const { data: bm } = await supabase.from("bookmarks").select("question_id");
+    const ids = (bm ?? []).map((r: { question_id: string }) => r.question_id);
+    if (ids.length) {
+      const { data } = await supabase.from("questions").select(COLS).in("id", ids);
+      selected = sample((data ?? []) as Question[], length);
+    }
+  } else if (daily) {
     // Daily challenge: same deterministic set for everyone all day, fresh daily.
     const todayISO = new Date().toISOString().slice(0, 10);
     const { data } = await supabase.from("questions").select(COLS);
@@ -124,12 +134,18 @@ export default async function PracticePage({
 
   const timedSeconds = timed && runnerMode === "exam" ? selected.length * 90 : undefined;
 
+  // Which of these questions the user has already bookmarked (best-effort).
+  const { data: bmRows } = await supabase.from("bookmarks").select("question_id");
+  const bookmarkedIds = (bmRows ?? []).map((r: { question_id: string }) => r.question_id);
+
   return (
     <PracticeRunner
       mode={runnerMode}
       initialQuestions={selected}
       persist
       timedSeconds={timedSeconds}
+      askConfidence={confidence && runnerMode !== "exam"}
+      initialBookmarkedIds={bookmarkedIds}
     />
   );
 }

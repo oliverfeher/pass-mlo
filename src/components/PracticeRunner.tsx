@@ -16,6 +16,7 @@ export type Question = {
   explanation: string;
   type?: string | null;
   difficulty?: string | null;
+  distractor_explanations?: (string | null)[] | null;
 };
 
 const LETTERS = ["A", "B", "C", "D", "E"];
@@ -40,14 +41,21 @@ export default function PracticeRunner({
   initialQuestions,
   persist,
   timedSeconds,
+  askConfidence = false,
+  initialBookmarkedIds = [],
 }: {
   mode: "practice" | "exam" | "diagnostic";
   initialQuestions: Question[];
   persist: boolean;
   timedSeconds?: number;
+  askConfidence?: boolean;
+  initialBookmarkedIds?: string[];
 }) {
   const supabase = useMemo(() => createClient(), []);
   const sessionIdRef = useRef<string | null>(null);
+  const [bookmarked, setBookmarked] = useState<Set<string>>(() => new Set(initialBookmarkedIds));
+  const [pendingChoice, setPendingChoice] = useState<number | null>(null);
+  const [confidences, setConfidences] = useState<Record<number, number>>({});
 
   // Shuffle question + option order once, client-only. Doing this during render
   // (e.g. in useMemo) reruns Math.random() on both server and client and produces
@@ -61,6 +69,10 @@ export default function PracticeRunner({
           ...q,
           options: order.map((i) => q.options[i]),
           correct_index: order.indexOf(q.correct_index),
+          // Keep per-distractor rationales aligned to the shuffled options.
+          distractor_explanations: q.distractor_explanations
+            ? order.map((i) => q.distractor_explanations![i] ?? null)
+            : null,
         };
       })
     );
@@ -81,6 +93,24 @@ export default function PracticeRunner({
       return n;
     });
 
+  // Persistent bookmark (save to revisit). Optimistic; DB write is best-effort
+  // (silently no-ops until migration 0003 adds the bookmarks table).
+  async function toggleBookmark(qid: string) {
+    const on = bookmarked.has(qid);
+    setBookmarked((s) => {
+      const n = new Set(s);
+      on ? n.delete(qid) : n.add(qid);
+      return n;
+    });
+    if (!persist) return;
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+    if (!user) return;
+    if (on) await supabase.from("bookmarks").delete().eq("user_id", user.id).eq("question_id", qid);
+    else await supabase.from("bookmarks").upsert({ user_id: user.id, question_id: qid });
+  }
+
   async function ensureSession() {
     if (!persist || sessionIdRef.current) return;
     const {
@@ -95,35 +125,61 @@ export default function PracticeRunner({
     if (data) sessionIdRef.current = data.id;
   }
 
-  async function recordItem(q: Question, chosen: number, order: number) {
+  async function recordItem(q: Question, chosen: number, order: number, confidence?: number) {
     if (!persist) return;
     await ensureSession();
     const {
       data: { user },
     } = await supabase.auth.getUser();
     if (!user || !sessionIdRef.current) return;
-    await supabase.from("session_items").insert({
-      session_id: sessionIdRef.current,
-      user_id: user.id,
-      question_id: q.id,
-      chosen_index: chosen,
-      is_correct: chosen === q.correct_index,
-      presented_order: order,
-    });
+    // Base insert uses only columns guaranteed to exist. Confidence is written
+    // in a separate best-effort update so the core record never fails if the
+    // confidence column isn't there yet (migration 0003).
+    const { data } = await supabase
+      .from("session_items")
+      .insert({
+        session_id: sessionIdRef.current,
+        user_id: user.id,
+        question_id: q.id,
+        chosen_index: chosen,
+        is_correct: chosen === q.correct_index,
+        presented_order: order,
+      })
+      .select("id")
+      .single();
+    if (confidence && data?.id) {
+      await supabase.from("session_items").update({ confidence }).eq("id", data.id);
+    }
+  }
+
+  // In confidence mode, an option pick is held until the learner rates how sure
+  // they are (before the answer is revealed — that's the whole point).
+  function commit(optIdx: number, confidence?: number) {
+    if (!session) return;
+    const q = session[idx];
+    setAnswers((a) => ({ ...a, [idx]: optIdx }));
+    setRevealed((r) => ({ ...r, [idx]: true }));
+    setPendingChoice(null);
+    if (confidence) setConfidences((c) => ({ ...c, [idx]: confidence }));
+    void recordItem(q, optIdx, idx, confidence);
   }
 
   function choose(optIdx: number) {
     if (!session) return;
-    const q = session[idx];
     if (mode === "practice" || mode === "diagnostic") {
       if (revealed[idx]) return;
-      setAnswers((a) => ({ ...a, [idx]: optIdx }));
-      setRevealed((r) => ({ ...r, [idx]: true }));
-      void recordItem(q, optIdx, idx);
+      if (askConfidence) setPendingChoice(optIdx); // hold for the confidence rating
+      else commit(optIdx);
     } else {
       setAnswers((a) => ({ ...a, [idx]: optIdx }));
     }
   }
+
+  const CONFIDENCE_OPTS = [
+    { v: 1, label: "Guessing" },
+    { v: 2, label: "Fairly sure" },
+    { v: 3, label: "Certain" },
+  ];
 
   // Exam answers are recorded in one batch at finish — so navigating back and
   // changing an answer doesn't leave stale duplicate rows.
@@ -330,6 +386,15 @@ export default function PracticeRunner({
         <span>Question {idx + 1} of {session.length}</span>
         <span style={{ display: "flex", alignItems: "center", gap: 12 }}>
           <span style={{ color: "#A9781F", fontWeight: 700, textTransform: "uppercase", fontSize: 11 }}>{q.content_area}</span>
+          {persist && (
+            <button
+              onClick={() => toggleBookmark(q.id)}
+              title={bookmarked.has(q.id) ? "Remove bookmark" : "Bookmark to revisit"}
+              style={{ background: "none", border: "none", cursor: "pointer", fontSize: 15, padding: 0, color: bookmarked.has(q.id) ? "#A9781F" : "#C9C0AE", lineHeight: 1 }}
+            >
+              {bookmarked.has(q.id) ? "★" : "☆"}
+            </button>
+          )}
           <button
             onClick={() => toggleFlag(idx)}
             title={isFlagged ? "Unflag" : "Flag for review"}
@@ -358,7 +423,7 @@ export default function PracticeRunner({
           if (isRevealed) {
             if (i === q.correct_index) { bg = "#E7F1EB"; border = "#2E7A57"; }
             else if (i === chosen) { bg = "#F6E7E1"; border = "#B2422A"; }
-          } else if (mode === "exam" && chosen === i) { bg = "#F3F1EC"; border = "#15233B"; }
+          } else if ((mode === "exam" && chosen === i) || pendingChoice === i) { bg = "#F3F1EC"; border = "#15233B"; }
           return (
             <button
               key={i}
@@ -377,12 +442,37 @@ export default function PracticeRunner({
         })}
       </div>
 
+      {!isRevealed && askConfidence && pendingChoice !== null && (
+        <div style={{ marginTop: 16, padding: "14px 16px", border: "1.5px solid #A9781F", borderRadius: 11, background: "#FBF7EE" }}>
+          <div style={{ fontSize: 13.5, fontWeight: 600, color: "#33404F", marginBottom: 10 }}>How sure are you?</div>
+          <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+            {CONFIDENCE_OPTS.map((c) => (
+              <button
+                key={c.v}
+                onClick={() => commit(pendingChoice, c.v)}
+                style={{ flex: "1 1 90px", padding: "10px", borderRadius: 9, border: "1.5px solid #E4DDCF", background: "#fff", color: "#15233B", fontWeight: 600, fontSize: 13.5, cursor: "pointer" }}
+              >
+                {c.label}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+
       {isRevealed && (
         <div style={{ marginTop: 16, borderLeft: "3px solid #A9781F", background: "#FBF7EE", borderRadius: "0 10px 10px 0", padding: "14px 16px" }}>
           <div style={{ fontWeight: 700, fontSize: 12, letterSpacing: 1, textTransform: "uppercase", color: "#A9781F", marginBottom: 6 }}>
             {chosen === q.correct_index ? "Correct" : `Answer: ${LETTERS[q.correct_index]}`}
+            {confidences[idx] === 3 && chosen !== q.correct_index && (
+              <span style={{ color: "#B2422A", marginLeft: 8 }}>· you were certain — worth a close look</span>
+            )}
           </div>
           <p style={{ margin: 0, fontSize: 14.5, lineHeight: 1.55, color: "#33404F" }}>{q.explanation}</p>
+          {q.distractor_explanations && chosen !== undefined && chosen !== q.correct_index && q.distractor_explanations[chosen] && (
+            <p style={{ margin: "10px 0 0", fontSize: 13.5, lineHeight: 1.5, color: "#8A3A24" }}>
+              <strong>Why {LETTERS[chosen]} is wrong:</strong> {q.distractor_explanations[chosen]}
+            </p>
+          )}
         </div>
       )}
 
