@@ -3,6 +3,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { areaBreakdown, overallPct, PASS_BAR, READY_BAR } from "@/lib/scoring";
 import { TYPES } from "@/lib/qmeta";
+import { splitTraps, hasTraps } from "@/lib/traps";
 import ReportButton from "./ReportButton";
 
 export type Question = {
@@ -267,7 +268,7 @@ export default function PracticeRunner({
                     </span>
                     {flagged.has(i) && <span style={{ color: "#A9781F", fontSize: 13 }}>⚑ flagged</span>}
                   </div>
-                  <p style={{ margin: "0 0 8px", fontSize: 15, lineHeight: 1.45 }}>{qq.stem}</p>
+                  <p style={{ margin: "0 0 8px", fontSize: 15, lineHeight: 1.45 }}><TrapText text={qq.stem} enabled /></p>
                   {yourAns !== undefined && !ok && (
                     <p style={{ margin: "0 0 3px", fontSize: 13.5, color: "#B2422A" }}>Your answer: {LETTERS[yourAns]}. {qq.options[yourAns]}</p>
                   )}
@@ -342,7 +343,14 @@ export default function PracticeRunner({
         <div style={{ width: `${pctBar}%`, height: "100%", background: "#A9781F" }} />
       </div>
 
-      <p style={{ fontSize: 18, lineHeight: 1.45, fontWeight: 500, marginBottom: 18 }}>{q.stem}</p>
+      <p style={{ fontSize: 18, lineHeight: 1.45, fontWeight: 500, marginBottom: isExam ? 18 : 8 }}>
+        <TrapText text={q.stem} enabled={!isExam} />
+      </p>
+      {!isExam && hasTraps(q.stem) && (
+        <p style={{ margin: "0 0 16px", fontSize: 12, color: "#A9781F" }}>
+          ⚠ Highlighted words flip the question — read them carefully.
+        </p>
+      )}
 
       <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
         {q.options.map((opt, i) => {
@@ -405,6 +413,22 @@ export default function PracticeRunner({
 
       {persist && <ReportButton key={q.id} questionId={q.id} />}
     </Shell>
+  );
+}
+
+// Renders a stem with trap-signalling qualifier words highlighted.
+function TrapText({ text, enabled }: { text: string; enabled: boolean }) {
+  if (!enabled || !hasTraps(text)) return <>{text}</>;
+  return (
+    <>
+      {splitTraps(text).map((s, i) =>
+        s.trap ? (
+          <mark key={i} style={{ background: "#FBE9C7", color: "#7A5A12", padding: "0 2px", borderRadius: 3, fontWeight: 700 }}>{s.text}</mark>
+        ) : (
+          <span key={i}>{s.text}</span>
+        )
+      )}
+    </>
   );
 }
 
