@@ -96,6 +96,25 @@ then `npm run seed` to push to the DB.
   Dashboard shows "N due", `/practice?srs=1` serves them most-overdue-first.
 - **Report-a-question** (`ReportButton` + migration `0002`): users flag bad questions; feeds
   the SME review. **Requires running `supabase/migrations/0002_question_reports.sql`.**
+- **Question metadata analytics** (`src/lib/qmeta.ts`): surfaces the `type` and `difficulty`
+  columns — dashboard "by question style" bars + `/practice?type=` / `?difficulty=` filters.
+- **Exam experience**: in-exam flag (⚑) + free back/skip navigation; exam answers recorded in
+  one batch at finish (no dup rows from back-nav); results screen has pass/below-bar verdict,
+  per-area AND per-type breakdowns, and an expandable per-question answer review.
+- **Trap-word highlighting** (`src/lib/traps.ts`): highlights qualifier words that flip
+  questions (EXCEPT/NOT/LEAST/"most likely"…) in practice stems + review; hidden during exams.
+- **Progress chart + daily challenge** (`src/lib/trends.ts`, `ProgressChart`): daily-accuracy
+  chart + approx time/question on the dashboard; `/practice?daily=1` = date-seeded daily set.
+- **Bookmarks / confidence / per-distractor rationales** (migration `0003`): ★ bookmark a
+  question (`/practice?bookmarks=1`); opt-in `/practice?confidence=1` rates sureness before the
+  reveal and flags "certain but wrong"; `questions.distractor_explanations` (jsonb) display is
+  scaffolded — **to activate, add `distractor_explanations` to `COLS` in `practice/page.tsx`
+  once content is authored.** All read best-effort so the app works pre-migration.
+- **Funnel**: landing shows a real free question + explanation; the free diagnostic result
+  generates an on-screen study plan (weakest 2 areas) + email lead capture (migration `0004`;
+  storage only — emailing needs a mail provider).
+- **Migrations to run (Supabase SQL editor):** `0002` reports, `0003` bookmarks/confidence/
+  distractors, `0004` leads. App degrades gracefully until each is applied.
 - **Recently fixed (for real):** `PracticeRunner.tsx` shuffled during render → React
   hydration mismatch. The shuffle had been in a `useMemo` (still runs during render on
   both server and client, so `Math.random()` diverged). It now runs in a client-only
