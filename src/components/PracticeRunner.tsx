@@ -2,6 +2,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { areaBreakdown, overallPct, PASS_BAR, READY_BAR } from "@/lib/scoring";
+import { TYPES } from "@/lib/qmeta";
 import ReportButton from "./ReportButton";
 
 export type Question = {
@@ -12,6 +13,8 @@ export type Question = {
   options: string[];
   correct_index: number;
   explanation: string;
+  type?: string | null;
+  difficulty?: string | null;
 };
 
 const LETTERS = ["A", "B", "C", "D", "E"];
@@ -65,8 +68,17 @@ export default function PracticeRunner({
   const [idx, setIdx] = useState(0);
   const [answers, setAnswers] = useState<Record<number, number>>({});
   const [revealed, setRevealed] = useState<Record<number, boolean>>({});
+  const [flagged, setFlagged] = useState<Set<number>>(new Set());
   const [done, setDone] = useState(false);
+  const [showReview, setShowReview] = useState(false);
   const [remaining, setRemaining] = useState<number | null>(timedSeconds ?? null);
+
+  const toggleFlag = (i: number) =>
+    setFlagged((s) => {
+      const n = new Set(s);
+      n.has(i) ? n.delete(i) : n.add(i);
+      return n;
+    });
 
   async function ensureSession() {
     if (!persist || sessionIdRef.current) return;
@@ -112,7 +124,32 @@ export default function PracticeRunner({
     }
   }
 
+  // Exam answers are recorded in one batch at finish — so navigating back and
+  // changing an answer doesn't leave stale duplicate rows.
+  async function recordExamAnswers() {
+    if (!persist || !session) return;
+    await ensureSession();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+    if (!user || !sessionIdRef.current) return;
+    const rows = session.flatMap((q, i) =>
+      answers[i] === undefined
+        ? []
+        : [{
+            session_id: sessionIdRef.current!,
+            user_id: user.id,
+            question_id: q.id,
+            chosen_index: answers[i],
+            is_correct: answers[i] === q.correct_index,
+            presented_order: i,
+          }]
+    );
+    if (rows.length) await supabase.from("session_items").insert(rows);
+  }
+
   async function finalize() {
+    if (mode === "exam") await recordExamAnswers();
     if (persist && sessionIdRef.current) {
       await supabase
         .from("sessions")
@@ -122,12 +159,12 @@ export default function PracticeRunner({
     setDone(true);
   }
 
+  function prev() {
+    if (idx > 0) setIdx(idx - 1);
+  }
+
   async function next() {
     if (!session) return;
-    if (mode === "exam") {
-      const q = session[idx];
-      if (answers[idx] !== undefined) void recordItem(q, answers[idx], idx);
-    }
     if (idx < session.length - 1) setIdx(idx + 1);
     else await finalize();
   }
@@ -158,31 +195,90 @@ export default function PracticeRunner({
       is_correct: answers[i] === q.correct_index,
     }));
     const pct = overallPct(items);
+    const correctCount = items.filter((i) => i.is_correct).length;
     const areas = areaBreakdown(items);
     const ready = pct >= READY_BAR;
+    const passed = pct >= PASS_BAR;
+
+    // Per-type breakdown (recall / scenario / calculation), if the set carries types.
+    const typeStats = TYPES.map((t) => {
+      const rel = session
+        .map((qq, i) => ({ type: qq.type, ok: answers[i] === qq.correct_index }))
+        .filter((x) => x.type === t.key);
+      return rel.length ? { label: t.label, correct: rel.filter((x) => x.ok).length, total: rel.length } : null;
+    }).filter(Boolean) as { label: string; correct: number; total: number }[];
+
+    const Bar = ({ label, correct, total }: { label: string; correct: number; total: number }) => {
+      const p = Math.round((correct / total) * 100);
+      return (
+        <div style={{ marginBottom: 12 }}>
+          <div style={{ display: "flex", justifyContent: "space-between", fontSize: 14, marginBottom: 5 }}>
+            <span style={{ fontWeight: 600 }}>{label}</span>
+            <span style={{ color: "#5A6478" }}>{correct}/{total} · {p}%</span>
+          </div>
+          <div style={{ height: 8, background: "#EAE4D7", borderRadius: 99, overflow: "hidden" }}>
+            <div style={{ width: `${p}%`, height: "100%", background: p >= PASS_BAR ? "#2E7A57" : p >= 50 ? "#A9781F" : "#B2422A" }} />
+          </div>
+        </div>
+      );
+    };
+
     return (
       <Shell>
-        <div style={{ textAlign: "center", padding: "6px 0 20px" }}>
-          <div style={{ fontSize: 60, fontWeight: 800, color: pct >= PASS_BAR ? "#2E7A57" : "#B2422A", letterSpacing: -2 }}>
+        <div style={{ textAlign: "center", padding: "6px 0 18px" }}>
+          <div style={{ display: "inline-block", padding: "3px 12px", borderRadius: 99, fontSize: 12, fontWeight: 700, letterSpacing: 1, textTransform: "uppercase", marginBottom: 8, color: "#fff", background: passed ? "#2E7A57" : "#B2422A" }}>
+            {passed ? "Pass" : "Below bar"}
+          </div>
+          <div style={{ fontSize: 60, fontWeight: 800, color: passed ? "#2E7A57" : "#B2422A", letterSpacing: -2, lineHeight: 1 }}>
             {pct}%
           </div>
-          <p style={{ color: "#5A6478" }}>Passing bar is {PASS_BAR}%.</p>
-          <p style={{ fontWeight: 700, color: ready ? "#2E7A57" : "#B2422A" }}>
-            {ready ? "Ready — you're above the bar with a buffer." : "Keep drilling to clear the bar with room to spare."}
+          <p style={{ color: "#5A6478", margin: "6px 0 0" }}>{correctCount} of {session.length} correct · passing bar {PASS_BAR}%</p>
+          <p style={{ fontWeight: 700, color: ready ? "#2E7A57" : passed ? "#A9781F" : "#B2422A", margin: "6px 0 0" }}>
+            {ready ? "Ready — above the bar with a buffer." : passed ? "At the bar — build more of a cushion." : "Keep drilling to clear the bar."}
           </p>
         </div>
+
         <h3 style={{ fontSize: 17, margin: "10px 0 12px" }}>By content area</h3>
-        {areas.map((a) => (
-          <div key={a.area} style={{ marginBottom: 12 }}>
-            <div style={{ display: "flex", justifyContent: "space-between", fontSize: 14, marginBottom: 5 }}>
-              <span style={{ fontWeight: 600 }}>{a.area}</span>
-              <span style={{ color: "#5A6478" }}>{a.correct}/{a.total} · {a.pct}%</span>
-            </div>
-            <div style={{ height: 8, background: "#EAE4D7", borderRadius: 99, overflow: "hidden" }}>
-              <div style={{ width: `${a.pct}%`, height: "100%", background: a.pct >= PASS_BAR ? "#2E7A57" : a.pct >= 50 ? "#A9781F" : "#B2422A" }} />
-            </div>
+        {areas.map((a) => <Bar key={a.area} label={a.area} correct={a.correct} total={a.total} />)}
+
+        {typeStats.length > 0 && (
+          <>
+            <h3 style={{ fontSize: 17, margin: "20px 0 12px" }}>By question type</h3>
+            {typeStats.map((t) => <Bar key={t.label} label={t.label} correct={t.correct} total={t.total} />)}
+          </>
+        )}
+
+        <button
+          onClick={() => setShowReview((v) => !v)}
+          style={{ marginTop: 18, width: "100%", background: "#15233B", color: "#fff", border: "none", borderRadius: 10, padding: "13px", fontWeight: 600, fontSize: 15, cursor: "pointer" }}
+        >
+          {showReview ? "Hide answer review" : `Review your answers${flagged.size ? ` (${flagged.size} flagged)` : ""}`}
+        </button>
+        {showReview && (
+          <div style={{ marginTop: 16 }}>
+            {session.map((qq, i) => {
+              const yourAns = answers[i];
+              const ok = yourAns === qq.correct_index;
+              return (
+                <div key={qq.id} style={{ borderTop: "1px solid #EAE4D7", padding: "14px 0" }}>
+                  <div style={{ display: "flex", justifyContent: "space-between", gap: 8, marginBottom: 6 }}>
+                    <span style={{ fontSize: 12, fontWeight: 700, color: ok ? "#2E7A57" : "#B2422A", textTransform: "uppercase", letterSpacing: 0.5 }}>
+                      {i + 1}. {yourAns === undefined ? "Skipped" : ok ? "Correct" : "Incorrect"}
+                    </span>
+                    {flagged.has(i) && <span style={{ color: "#A9781F", fontSize: 13 }}>⚑ flagged</span>}
+                  </div>
+                  <p style={{ margin: "0 0 8px", fontSize: 15, lineHeight: 1.45 }}>{qq.stem}</p>
+                  {yourAns !== undefined && !ok && (
+                    <p style={{ margin: "0 0 3px", fontSize: 13.5, color: "#B2422A" }}>Your answer: {LETTERS[yourAns]}. {qq.options[yourAns]}</p>
+                  )}
+                  <p style={{ margin: "0 0 8px", fontSize: 13.5, color: "#2E7A57" }}>Correct: {LETTERS[qq.correct_index]}. {qq.options[qq.correct_index]}</p>
+                  <p style={{ margin: 0, fontSize: 13.5, lineHeight: 1.5, color: "#33404F", background: "#FBF7EE", borderRadius: 8, padding: "10px 12px" }}>{qq.explanation}</p>
+                </div>
+              );
+            })}
           </div>
-        ))}
+        )}
+
         {mode === "diagnostic" && (
           <div style={{ marginTop: 24, textAlign: "center" }}>
             <a href="/pricing" style={{ background: "#A9781F", color: "#fff", padding: "13px 24px", borderRadius: 10, fontWeight: 600, textDecoration: "none" }}>
@@ -207,8 +303,10 @@ export default function PracticeRunner({
   const q = session[idx];
   const chosen = answers[idx];
   const isRevealed = (mode !== "exam") && revealed[idx];
-  const canAdvance = mode === "exam" ? chosen !== undefined : isRevealed;
+  const isExam = mode === "exam";
+  const canAdvance = isExam ? true : isRevealed; // exam lets you skip / come back
   const pctBar = Math.round(((idx + (canAdvance ? 1 : 0)) / session.length) * 100);
+  const isFlagged = flagged.has(idx);
 
   return (
     <Shell>
@@ -227,9 +325,18 @@ export default function PracticeRunner({
           </span>
         </div>
       )}
-      <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 10, fontSize: 13, color: "#5A6478" }}>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 10, fontSize: 13, color: "#5A6478" }}>
         <span>Question {idx + 1} of {session.length}</span>
-        <span style={{ color: "#A9781F", fontWeight: 700, textTransform: "uppercase", fontSize: 11 }}>{q.content_area}</span>
+        <span style={{ display: "flex", alignItems: "center", gap: 12 }}>
+          <span style={{ color: "#A9781F", fontWeight: 700, textTransform: "uppercase", fontSize: 11 }}>{q.content_area}</span>
+          <button
+            onClick={() => toggleFlag(idx)}
+            title={isFlagged ? "Unflag" : "Flag for review"}
+            style={{ background: "none", border: "none", cursor: "pointer", fontSize: 15, padding: 0, color: isFlagged ? "#A9781F" : "#C9C0AE", lineHeight: 1 }}
+          >
+            {isFlagged ? "⚑" : "⚐"}
+          </button>
+        </span>
       </div>
       <div style={{ height: 6, background: "#E9E3D6", borderRadius: 99, overflow: "hidden", marginBottom: 20 }}>
         <div style={{ width: `${pctBar}%`, height: "100%", background: "#A9781F" }} />
@@ -271,17 +378,30 @@ export default function PracticeRunner({
         </div>
       )}
 
-      <button
-        onClick={next}
-        disabled={!canAdvance}
-        style={{
-          marginTop: 20, width: "100%", background: "#A9781F", color: "#fff",
-          padding: "15px", border: "none", borderRadius: 10, fontWeight: 600, fontSize: 16,
-          cursor: canAdvance ? "pointer" : "not-allowed", opacity: canAdvance ? 1 : 0.45,
-        }}
-      >
-        {idx === session.length - 1 ? "Finish & see results" : "Next question"}
-      </button>
+      <div style={{ display: "flex", gap: 10, marginTop: 20 }}>
+        {isExam && idx > 0 && (
+          <button
+            onClick={prev}
+            style={{
+              flex: "0 0 auto", padding: "15px 20px", background: "#fff", color: "#15233B",
+              border: "1.5px solid #E4DDCF", borderRadius: 10, fontWeight: 600, fontSize: 15, cursor: "pointer",
+            }}
+          >
+            ← Back
+          </button>
+        )}
+        <button
+          onClick={next}
+          disabled={!canAdvance}
+          style={{
+            flex: 1, background: "#A9781F", color: "#fff",
+            padding: "15px", border: "none", borderRadius: 10, fontWeight: 600, fontSize: 16,
+            cursor: canAdvance ? "pointer" : "not-allowed", opacity: canAdvance ? 1 : 0.45,
+          }}
+        >
+          {idx === session.length - 1 ? "Finish & see results" : isExam && chosen === undefined ? "Skip" : "Next question"}
+        </button>
+      </div>
 
       {persist && <ReportButton key={q.id} questionId={q.id} />}
     </Shell>

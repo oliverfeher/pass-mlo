@@ -8,7 +8,7 @@ import { TYPE_KEYS, DIFFICULTY_KEYS } from "@/lib/qmeta";
 import { sample, buildSmartMix } from "@/lib/selection";
 import PracticeRunner, { type Question } from "@/components/PracticeRunner";
 
-const COLS = "id,content_area,subtopic,stem,options,correct_index,explanation";
+const COLS = "id,content_area,subtopic,stem,options,correct_index,explanation,type,difficulty";
 
 // Server component: decides what the user is allowed to see, then hands a
 // question set to the client runner. RLS is the real gate; this mirrors it in UI.
@@ -42,7 +42,7 @@ export default async function PracticePage({
   if (mode === "diagnostic") {
     const { data } = await supabase
       .from("questions")
-      .select("id,content_area,subtopic,stem,options,correct_index,explanation")
+      .select(COLS)
       .eq("is_free", true)
       .limit(length);
     return <PracticeRunner mode="diagnostic" initialQuestions={(data ?? []) as Question[]} persist={false} />;
