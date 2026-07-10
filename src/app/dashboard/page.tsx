@@ -2,6 +2,7 @@ import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { hasEntitlement } from "@/lib/entitlements";
 import { fetchProgress, missedIds, currentStreak } from "@/lib/progress";
+import { dueQuestionIds } from "@/lib/srs";
 import { AREAS } from "@/lib/areas";
 import { computeReadiness, bandColor, PASS_BAR } from "@/lib/readiness";
 import { daysUntil, studyPace } from "@/lib/plan";
@@ -33,6 +34,7 @@ export default async function DashboardPage() {
   const todayISO = new Date().toISOString().slice(0, 10);
   const streak = currentStreak(prog.answeredDates, todayISO);
   const missed = missedIds(prog.items).length;
+  const dueCount = dueQuestionIds(prog.items, Date.now()).length;
   const readiness = computeReadiness(
     AREAS.map((a) => ({
       key: a.key,
@@ -106,6 +108,32 @@ export default async function DashboardPage() {
         onTrack={pace.onTrack}
         todayISO={todayISO}
       />
+
+      {/* Spaced review */}
+      {dueCount > 0 ? (
+        <Link
+          href="/practice?srs=1&length=20"
+          style={{
+            display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12,
+            textDecoration: "none", marginBottom: 12, padding: "16px 18px", borderRadius: 12,
+            background: "#FBF7EE", border: "1.5px solid #A9781F",
+          }}
+        >
+          <div>
+            <div style={{ fontWeight: 700, color: "#15233B", fontSize: 15 }}>
+              🔁 {dueCount} question{dueCount === 1 ? "" : "s"} due for review
+            </div>
+            <div style={{ fontSize: 13, color: "#5A6478", marginTop: 2 }}>
+              Spaced repetition — review them before they fade.
+            </div>
+          </div>
+          <span style={{ color: "#A9781F", fontWeight: 700, fontSize: 14, whiteSpace: "nowrap" }}>Start →</span>
+        </Link>
+      ) : prog.totalAnswered > 0 ? (
+        <div style={{ marginBottom: 12, padding: "12px 18px", borderRadius: 12, background: "#EDE8DD", color: "#5A6478", fontSize: 13.5 }}>
+          ✓ No reviews due right now — you&rsquo;re caught up.
+        </div>
+      ) : null}
 
       {/* Engagement */}
       <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 10, margin: "0 0 26px" }}>

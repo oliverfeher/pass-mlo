@@ -2,6 +2,7 @@ import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { hasEntitlement } from "@/lib/entitlements";
 import { fetchProgress, missedIds } from "@/lib/progress";
+import { dueQuestionIds } from "@/lib/srs";
 import { AREA_KEYS } from "@/lib/areas";
 import { sample, buildSmartMix } from "@/lib/selection";
 import PracticeRunner, { type Question } from "@/components/PracticeRunner";
@@ -13,7 +14,7 @@ const COLS = "id,content_area,subtopic,stem,options,correct_index,explanation";
 export default async function PracticePage({
   searchParams,
 }: {
-  searchParams: { mode?: string; area?: string; areas?: string; length?: string; mix?: string; review?: string; timed?: string };
+  searchParams: { mode?: string; area?: string; areas?: string; length?: string; mix?: string; review?: string; srs?: string; timed?: string };
 }) {
   const mode = (searchParams.mode as "practice" | "exam" | "diagnostic") ?? "practice";
   const area = searchParams.area;
@@ -24,6 +25,7 @@ export default async function PracticePage({
     .filter((s) => AREA_KEYS.includes(s));
   const mix = searchParams.mix;       // "weak" = Smart mix
   const review = searchParams.review === "1";
+  const srs = searchParams.srs === "1"; // spaced-repetition "due today"
   const timed = searchParams.timed === "1";
   const defaultLen = mode === "diagnostic" ? 10 : mode === "exam" ? 115 : 15;
   const length = Math.min(Number(searchParams.length) || defaultLen, 120);
@@ -71,7 +73,19 @@ export default async function PracticePage({
   const runnerMode = mode === "exam" ? "exam" : "practice";
   let selected: Question[] = [];
 
-  if (review) {
+  if (srs) {
+    // Spaced repetition: questions whose review interval has elapsed, most
+    // overdue first (order preserved, not sampled).
+    const prog = await fetchProgress(supabase, user.id);
+    const ids = dueQuestionIds(prog.items, Date.now());
+    if (ids.length) {
+      const { data } = await supabase.from("questions").select(COLS).in("id", ids);
+      const order = new Map(ids.map((id, i) => [id, i]));
+      selected = ((data ?? []) as Question[])
+        .sort((a, b) => (order.get(a.id) ?? 0) - (order.get(b.id) ?? 0))
+        .slice(0, length);
+    }
+  } else if (review) {
     // Re-drill questions whose most recent attempt was wrong.
     const prog = await fetchProgress(supabase, user.id);
     const ids = missedIds(prog.items);
