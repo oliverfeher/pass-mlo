@@ -87,9 +87,6 @@ export default async function DashboardPage() {
         />
       </div>
 
-      <p style={{ marginTop: 28, fontSize: 12, color: "#98A0AE", textAlign: "center" }}>
-        Study aid. Not affiliated with or endorsed by NMLS.
-      </p>
     </main>
   );
 }

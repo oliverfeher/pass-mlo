@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import SiteNav from "@/components/SiteNav";
+import SiteFooter from "@/components/SiteFooter";
 
 export const metadata: Metadata = {
   title: "MLO Prep — Pass the SAFE MLO Exam",
@@ -10,7 +12,13 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
-      <body>{children}</body>
+      <body>
+        <div style={{ minHeight: "100vh", display: "flex", flexDirection: "column" }}>
+          <SiteNav />
+          <div style={{ flex: 1 }}>{children}</div>
+          <SiteFooter />
+        </div>
+      </body>
     </html>
   );
 }

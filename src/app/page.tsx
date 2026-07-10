@@ -55,10 +55,6 @@ export default async function Home() {
           <li>Uniform State Content — 11%</li>
         </ul>
       </div>
-
-      <p style={{ marginTop: 40, fontSize: 12, color: "#5A6478" }}>
-        Study aid. Not affiliated with or endorsed by NMLS. Not legal advice.
-      </p>
     </main>
   );
 }
