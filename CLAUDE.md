@@ -82,8 +82,20 @@ then `npm run seed` to push to the DB.
   exam** launcher. Entitled users are redirected here from `/`. All progress is derived from
   `session_items` (no new tables) — see `src/lib/progress.ts` + `src/lib/selection.ts`.
 - **Practice selection**: `/practice` now accepts `?areas=A,B` (multi), `?mix=weak` (smart),
-  `?review=1` (missed queue), and `?timed=1` (exam countdown, ~90s/question). Questions are
-  now *sampled* server-side so repeat sessions vary (previously returned the same first N).
+  `?review=1` (missed queue), `?srs=1` (spaced-repetition due queue), and `?timed=1` (exam
+  countdown, ~90s/question). Questions are *sampled* server-side so repeat sessions vary
+  (previously returned the same first N).
+- **Calibrated readiness** (`src/lib/readiness.ts`): the dashboard readiness number is NOT raw
+  accuracy — it's exam-weighted, shrinkage-adjusted for thin samples, and reported with a
+  confidence signal. Conservative by design (a licensing product must not over-promise).
+- **Exam-date countdown** (`src/lib/plan.ts` + `ExamDateCard`): test date lives in Supabase
+  **user metadata** (`user_metadata.exam_date`), not a table. Dashboard shows days-left + a
+  questions/day pace derived from areas not yet at the bar.
+- **Spaced repetition** (`src/lib/srs.ts`): *derived from `session_items`*, no table. Leitner
+  box = run of consecutive corrects; intervals 0/1/3/7/14/30 days; missed/regressed are due now.
+  Dashboard shows "N due", `/practice?srs=1` serves them most-overdue-first.
+- **Report-a-question** (`ReportButton` + migration `0002`): users flag bad questions; feeds
+  the SME review. **Requires running `supabase/migrations/0002_question_reports.sql`.**
 - **Recently fixed (for real):** `PracticeRunner.tsx` shuffled during render → React
   hydration mismatch. The shuffle had been in a `useMemo` (still runs during render on
   both server and client, so `Math.random()` diverged). It now runs in a client-only
@@ -117,8 +129,12 @@ on conflict (user_id, product) do nothing;
 - ✅ **Mastery dashboard** — done (per-area; per-*subtopic* still TODO if wanted).
 - ✅ **Review queue** — done (most-recent-wrong drops out on next correct answer). Next
   step if desired: require N-consecutive-correct before a question graduates.
-- **Spaced repetition** (v1.1): the `srs_state` table is anticipated in the schema notes.
-- **Flag for review**: let users manually mark a question to revisit (needs a small table/col).
+- ✅ **Spaced repetition** — done, but *derived from `session_items`* (no `srs_state` table).
+  Upgrade path if scale demands: persist per-question box/ease in a table instead of recomputing.
+- ✅ **Calibrated readiness**, ✅ **exam-date countdown**, ✅ **report-a-question** — done this batch.
+- **SME triage UI**: a `question_reports` queue exists in the DB; still needs an admin view to
+  work through it (currently read via service role only).
+- **Flag for review**: let users manually bookmark a question to revisit (distinct from reporting).
 - **Content**: last stretch to the 351 target if desired; then depth per node.
 - **Deploy**: Vercel + Supabase + Stripe (one-time Price, webhook → entitlement).
 - **CI**: GitHub Action running `npm run qa` + `npm run coverage` on every push so a
