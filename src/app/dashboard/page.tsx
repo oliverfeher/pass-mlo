@@ -4,7 +4,9 @@ import { hasEntitlement } from "@/lib/entitlements";
 import { fetchProgress, missedIds, currentStreak } from "@/lib/progress";
 import { AREAS } from "@/lib/areas";
 import { computeReadiness, bandColor, PASS_BAR } from "@/lib/readiness";
+import { daysUntil, studyPace } from "@/lib/plan";
 import CategoryPicker, { type AreaRow } from "@/components/CategoryPicker";
+import ExamDateCard from "@/components/ExamDateCard";
 
 const SHORT = Object.fromEntries(AREAS.map((a) => [a.key, a.short]));
 
@@ -40,6 +42,15 @@ export default async function DashboardPage() {
     }))
   );
   const areasReady = readiness.areas.filter((a) => a.confident && a.estPct >= PASS_BAR).length;
+
+  // Exam-date countdown + pace (exam date stored in user metadata).
+  const TARGET_PER_AREA = 25;
+  const examDate = ((user.user_metadata as Record<string, unknown> | null)?.exam_date as string) ?? null;
+  const daysLeft = examDate ? daysUntil(examDate, todayISO) : null;
+  const notReadyRemaining = readiness.areas
+    .filter((a) => !(a.confident && a.estPct >= PASS_BAR))
+    .reduce((s, a) => s + Math.max(0, TARGET_PER_AREA - a.total), 0);
+  const pace = studyPace(daysLeft ?? 1, notReadyRemaining);
 
   const rows: AreaRow[] = AREAS.map((a) => {
     const s = prog.byArea[a.key];
@@ -86,6 +97,15 @@ export default async function DashboardPage() {
           </div>
         </div>
       </section>
+
+      {/* Exam countdown + pace */}
+      <ExamDateCard
+        examDate={examDate}
+        daysLeft={daysLeft}
+        dailyGoal={pace.dailyGoal}
+        onTrack={pace.onTrack}
+        todayISO={todayISO}
+      />
 
       {/* Engagement */}
       <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 10, margin: "0 0 26px" }}>
