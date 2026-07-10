@@ -8,6 +8,8 @@ export type ProgressItem = {
   is_correct: boolean | null;
   answered_at: string;
   content_area: string;
+  type: string | null;         // recall | application-scenario | calculation
+  difficulty: string | null;   // easy | medium | hard
 };
 
 export type Progress = {
@@ -24,7 +26,7 @@ export async function fetchProgress(
 ): Promise<Progress> {
   const { data } = await supabase
     .from("session_items")
-    .select("question_id, is_correct, answered_at, questions(content_area)")
+    .select("question_id, is_correct, answered_at, questions(content_area, type, difficulty)")
     .eq("user_id", userId);
 
   const items: ProgressItem[] = (data ?? []).map((r: any) => ({
@@ -32,6 +34,8 @@ export async function fetchProgress(
     is_correct: r.is_correct,
     answered_at: r.answered_at,
     content_area: r.questions?.content_area ?? "Unknown",
+    type: r.questions?.type ?? null,
+    difficulty: r.questions?.difficulty ?? null,
   }));
 
   const byArea: Record<string, { correct: number; total: number }> = {};

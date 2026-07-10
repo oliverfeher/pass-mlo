@@ -4,6 +4,7 @@ import { hasEntitlement } from "@/lib/entitlements";
 import { fetchProgress, missedIds } from "@/lib/progress";
 import { dueQuestionIds } from "@/lib/srs";
 import { AREA_KEYS } from "@/lib/areas";
+import { TYPE_KEYS, DIFFICULTY_KEYS } from "@/lib/qmeta";
 import { sample, buildSmartMix } from "@/lib/selection";
 import PracticeRunner, { type Question } from "@/components/PracticeRunner";
 
@@ -14,7 +15,7 @@ const COLS = "id,content_area,subtopic,stem,options,correct_index,explanation";
 export default async function PracticePage({
   searchParams,
 }: {
-  searchParams: { mode?: string; area?: string; areas?: string; length?: string; mix?: string; review?: string; srs?: string; timed?: string };
+  searchParams: { mode?: string; area?: string; areas?: string; length?: string; mix?: string; review?: string; srs?: string; timed?: string; type?: string; difficulty?: string };
 }) {
   const mode = (searchParams.mode as "practice" | "exam" | "diagnostic") ?? "practice";
   const area = searchParams.area;
@@ -27,6 +28,8 @@ export default async function PracticePage({
   const review = searchParams.review === "1";
   const srs = searchParams.srs === "1"; // spaced-repetition "due today"
   const timed = searchParams.timed === "1";
+  const type = TYPE_KEYS.includes(searchParams.type ?? "") ? searchParams.type! : null;
+  const difficulty = DIFFICULTY_KEYS.includes(searchParams.difficulty ?? "") ? searchParams.difficulty! : null;
   const defaultLen = mode === "diagnostic" ? 10 : mode === "exam" ? 115 : 15;
   const length = Math.min(Number(searchParams.length) || defaultLen, 120);
 
@@ -104,9 +107,11 @@ export default async function PracticePage({
     const { data } = await supabase.from("questions").select(COLS);
     selected = buildSmartMix((data ?? []) as Question[], accuracy, length);
   } else {
-    // Area(s) filter, or all areas. Sample so sessions vary run to run.
+    // Area(s) / type / difficulty filters, or all. Sample so sessions vary.
     let query = supabase.from("questions").select(COLS);
     if (areas.length) query = query.in("content_area", areas);
+    if (type) query = query.eq("type", type);
+    if (difficulty) query = query.eq("difficulty", difficulty);
     const { data } = await query;
     selected = sample((data ?? []) as Question[], length);
   }

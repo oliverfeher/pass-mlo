@@ -4,6 +4,7 @@ import { hasEntitlement } from "@/lib/entitlements";
 import { fetchProgress, missedIds, currentStreak } from "@/lib/progress";
 import { dueQuestionIds } from "@/lib/srs";
 import { AREAS } from "@/lib/areas";
+import { breakdown, TYPES, DIFFICULTIES } from "@/lib/qmeta";
 import { computeReadiness, bandColor, PASS_BAR } from "@/lib/readiness";
 import { daysUntil, studyPace } from "@/lib/plan";
 import CategoryPicker, { type AreaRow } from "@/components/CategoryPicker";
@@ -44,6 +45,8 @@ export default async function DashboardPage() {
     }))
   );
   const areasReady = readiness.areas.filter((a) => a.confident && a.estPct >= PASS_BAR).length;
+  const typeCuts = breakdown(prog.items, TYPES, (it) => it.type);
+  const diffCuts = breakdown(prog.items, DIFFICULTIES, (it) => it.difficulty);
 
   // Exam-date countdown + pace (exam date stored in user metadata).
   const TARGET_PER_AREA = 25;
@@ -168,7 +171,43 @@ export default async function DashboardPage() {
         />
       </div>
 
+      {/* By type / difficulty — the scenario questions are where people fail */}
+      {(typeCuts.length > 0 || diffCuts.length > 0) && (
+        <section style={{ ...card, marginTop: 16 }}>
+          <h2 style={h2}>How you do by question style</h2>
+          <p style={{ margin: "0 0 16px", color: "#5A6478", fontSize: 14, lineHeight: 1.5 }}>
+            Tap any bar to drill just those. Application scenarios are where most people lose points.
+          </p>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 24 }}>
+            <CutGroup title="By type" cuts={typeCuts} param="type" />
+            <CutGroup title="By difficulty" cuts={diffCuts} param="difficulty" />
+          </div>
+        </section>
+      )}
     </main>
+  );
+}
+
+function CutGroup({ title, cuts, param }: { title: string; cuts: { key: string; label: string; total: number; pct: number }[]; param: "type" | "difficulty" }) {
+  return (
+    <div style={{ minWidth: 0 }}>
+      <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: 1, textTransform: "uppercase", color: "#98A0AE", marginBottom: 10 }}>{title}</div>
+      {cuts.length === 0 ? (
+        <p style={{ fontSize: 13, color: "#98A0AE" }}>No data yet.</p>
+      ) : (
+        cuts.map((c) => (
+          <Link key={c.key} href={`/practice?${param}=${encodeURIComponent(c.key)}&length=15`} style={{ display: "block", textDecoration: "none", marginBottom: 12 }}>
+            <div style={{ display: "flex", justifyContent: "space-between", fontSize: 13.5, marginBottom: 4 }}>
+              <span style={{ color: "#15233B", fontWeight: 600 }}>{c.label}</span>
+              <span style={{ color: "#5A6478" }}>{c.pct}% <span style={{ color: "#98A0AE" }}>· {c.total}</span></span>
+            </div>
+            <div style={{ height: 7, background: "#EAE4D7", borderRadius: 99, overflow: "hidden" }}>
+              <div style={{ width: `${c.pct}%`, height: "100%", background: c.pct >= PASS_BAR ? "#2E7A57" : c.pct >= 50 ? "#A9781F" : "#B2422A" }} />
+            </div>
+          </Link>
+        ))
+      )}
+    </div>
   );
 }
 
